@@ -1,33 +1,16 @@
 package repository;
 
+import dao.UserDao;
 import entity.User;
-import repository.CrudRepository;
 
 import java.util.List;
 
-public interface UserRepository extends CrudRepository<User> {
-    @Override
-    default User getEntityById(String id) {
-        return null;
-    }
+public interface UserRepository  {
 
-    @Override
-    default boolean removeById(String id) {
-        return false;
-    }
+    List<User> findAll();
 
-    @Override
-    default boolean add(User user) {
-        return false;
-    }
+    User getById(long id);
 
-    @Override
-    default boolean update(User user) {
-        return false;
-    }
+     void save(UserDao userDao);
 
-    @Override
-    default List<User> getAll() {
-        return null;
-    }
 }

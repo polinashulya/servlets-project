@@ -9,6 +9,10 @@ public class ConnectionWrapper implements Connection {
 
     private Connection connection;
 
+    public ConnectionWrapper(Connection connection) {
+        this.connection = connection;
+    }
+
     @Override
     public void close() throws SQLException {
 
