@@ -3,7 +3,10 @@ package repository;
 import dao.UserDao;
 import dao.impl.UserDaoImpl;
 import entity.User;
+import entity.UserStatus;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
@@ -25,8 +28,13 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void save(UserDao userDao) {
+    public void save(User user) {
+        userDao.save(user);
+    }
 
+    @Override
+    public void deleteById(long id) {
+        userDao.delete(id);
     }
 
     public static void main(String[] args) {
@@ -34,13 +42,18 @@ public class UserRepositoryImpl implements UserRepository {
         UserRepositoryImpl repository = new UserRepositoryImpl();
         List<User> users = repository.findAll();
 
-        System.out.println(
+//        User user = new User(3L, "11111", "pass", "chakun", "polya", UserStatus.ADMIN, LocalDate.of(2014, Month.JANUARY, 1), false);
+//        repository.save(user);
 
+        System.out.println(
+                users
         );
 
-        System.out.println(
-                repository.getById(1)
-        );
+//        repository.deleteById(6);
+
+//        System.out.println(
+//                repository.getById(1)
+//        );
 
     }
 }

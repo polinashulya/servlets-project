@@ -11,6 +11,8 @@ public interface UserRepository  {
 
     User getById(long id);
 
-     void save(UserDao userDao);
+     void save(User user);
+
+     void deleteById(long id);
 
 }

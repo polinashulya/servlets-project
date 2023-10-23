@@ -7,6 +7,7 @@ import entity.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
 
@@ -31,30 +32,14 @@ public class UserDaoImpl implements UserDao {
 
             ResultSet set = statement.executeQuery();
 
-            while(set.next()) {
-                // todo should it be separate method to be reused by getById ?
+            while (set.next()) {
                 User user = getUser(set);
 
                 users.add(user);
             }
 
         } catch (SQLException ex) {
-            System.err.println(); //todo should i use exceptions here?
-        } finally { // todo how can the finally block be optimized to be reuzed between  multiple  method or even multiple daos?
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception ex) {
-                    //todo should i throw exception or just log?
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            closeConnection(connection, statement);
         }
 
         return users;
@@ -74,84 +59,102 @@ public class UserDaoImpl implements UserDao {
 
             ResultSet set = statement.executeQuery();
 
-            if(set.next()) {
-                // todo should it be separate method to be reused by getById ?
+            if (set.next()) {
                 user = getUser(set);
             }
 
         } catch (SQLException ex) {
-            System.err.println(); //todo should i use exceptions here?
-        } finally { // todo how can the finally block be optimized to be reuzed between  multiple  method or even multiple daos?
-            if (connection != null) {
-                try {
-                    connection.close();
-                } catch (Exception ex) {
-                    //todo should i throw exception or just log?
-                }
-            }
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (Exception ex) {
-
-                }
-            }
+            System.err.println();
+        } finally {
+            closeConnection(connection, statement);
         }
 
         return user;
     }
 
+    @Override
+    public Optional<User> findById(long id) {
+        return Optional.ofNullable(getById(id));
+    }
+
     private static User getUser(ResultSet set) throws SQLException {
         return User.builder()
                 .id(set.getLong(1))
-                .firstName(set.getString(2))
+                .login(set.getString(2))
+                .password(set.getString(3))
+                .firstName(set.getString(4))
+                .secondName(set.getString(5))
+                .birthDate((set.getDate(6)).toLocalDate())
+                .banned(set.getBoolean(7))
                 .build();
     }
 
+
     @Override
     public void save(User user) {
-//        Connection connection = null;
-//        PreparedStatement statement = null;
-//
-//        List<User> users = new ArrayList<>();
-//
-//        try {
-//            connection = connectionPool.getConnection();
-//            statement = connection.prepareStatement("INSERT INTO users (login, password, first_name, second_name, birth_date, banned ) VALUES (?,?,?);");
-//
-//
-//            statement.setString(2, user.getLogin());
-//            statement.setString(3, user.getPassword());
-//            statement.setString(4, user.getFirstName());
-//            statement.setString(5, user.getSurname());
-//            statement.setDate(6, Date.valueOf(user.getBirthDate()));
-//            statement.setBoolean(7, user.isBanned());
-//
-//            ResultSet row = statement.executeQuery();
-//
-//        } catch (SQLException ex) {
-//            System.err.println(); //todo should i use exceptions here?
-//        } finally { // todo how can the finally block be optimized to be reuzed between  multiple  method or even multiple daos?
-//            if (connection != null) {
-//                try {
-//                    connection.close();
-//                } catch (Exception ex) {
-//                    //todo should i throw exception or just log?
-//                }
-//            }
-//            if (statement != null) {
-//                try {
-//                    statement.close();
-//                } catch (Exception ex) {
-//
-//                }
-//            }
-//        }
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        try {
+            connection = connectionPool.getConnection();
+            statement = connection.prepareStatement("INSERT INTO users (login, password, first_name, second_name, birth_date, banned ) VALUES (?,?,?,?,?,?);");
+
+            statement.setString(1, user.getLogin());
+            statement.setString(2, user.getPassword());
+            statement.setString(3, user.getFirstName());
+            statement.setString(4, user.getSecondName());
+            statement.setDate(5, Date.valueOf(user.getBirthDate()));
+            statement.setBoolean(6, user.isBanned());
+
+            ResultSet row = statement.executeQuery();
+
+        } catch (SQLException ex) {
+            System.err.println(); //todo should i use exceptions here?
+//            throw new DaoException(ex);
+        } finally {
+            closeConnection(connection, statement);
+        }
 
     }
 
     @Override
     public void delete(long id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
 
+        User user = null;
+        try {
+            if (findById(id).isPresent()) {
+                statement = connection.prepareStatement("UPDATE users SET banned=true where id = ?;");
+
+                statement.setLong(1, id);
+
+                int row = statement.executeUpdate();
+
+            }
+
+        } catch (SQLException ex) {
+            System.err.println();
+        } finally {
+            closeConnection(connection, statement);
+        }
+
+    }
+
+    private static void closeConnection(Connection connection, PreparedStatement statement) {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (Exception ex) {
+                //todo should i throw exception or just log?
+            }
+        }
+        if (statement != null) {
+            try {
+                statement.close();
+            } catch (Exception ex) {
+
+            }
+        }
     }
 }
