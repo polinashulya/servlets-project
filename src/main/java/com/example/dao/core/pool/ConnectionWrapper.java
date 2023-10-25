@@ -1,4 +1,4 @@
-package dao.core.pool;
+package com.example.dao.core.pool;
 
 import java.sql.*;
 import java.util.Map;

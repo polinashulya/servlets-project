@@ -1,8 +1,9 @@
-package dao.impl;
+package com.example.dao.impl;
 
-import dao.ConnectionPool;
-import dao.UserDao;
-import entity.User;
+import com.example.entity.User;
+import com.example.dao.ConnectionPool;
+import com.example.dao.UserDao;
+import com.example.exception.DAOException;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
 
-    private static final String sql = "select id, first_name from users;";
+    private static final String sql = "select id,login, password, first_name, second_name, birth_date, banned from users;";
     private final ConnectionPool connectionPool;
 
     public UserDaoImpl() {
@@ -20,7 +21,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll()  {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -39,6 +40,8 @@ public class UserDaoImpl implements UserDao {
             }
 
         } catch (SQLException ex) {
+            throw new DAOException(ex);
+        } finally {
             closeConnection(connection, statement);
         }
 
@@ -46,7 +49,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User getById(long id) {
+    public User getById(long id)  {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -65,6 +68,7 @@ public class UserDaoImpl implements UserDao {
 
         } catch (SQLException ex) {
             System.err.println();
+            throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
         }
@@ -73,7 +77,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> findById(long id) {
+    public Optional<User> findById(long id)  {
         return Optional.ofNullable(getById(id));
     }
 
@@ -91,7 +95,7 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
-    public void save(User user) {
+    public void save(User user)  {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -109,8 +113,8 @@ public class UserDaoImpl implements UserDao {
             ResultSet row = statement.executeQuery();
 
         } catch (SQLException ex) {
-            System.err.println(); //todo should i use exceptions here?
-//            throw new DaoException(ex);
+            System.err.println();
+            throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
         }
@@ -118,7 +122,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(long id)  {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -135,6 +139,7 @@ public class UserDaoImpl implements UserDao {
 
         } catch (SQLException ex) {
             System.err.println();
+            throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
         }
@@ -146,7 +151,7 @@ public class UserDaoImpl implements UserDao {
             try {
                 connection.close();
             } catch (Exception ex) {
-                //todo should i throw exception or just log?
+                //todo should i throw org.exception or just log?
             }
         }
         if (statement != null) {
