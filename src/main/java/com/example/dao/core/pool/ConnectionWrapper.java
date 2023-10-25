@@ -1,4 +1,4 @@
-package dao.core.pool;
+package com.example.dao.core.pool;
 
 import java.sql.*;
 import java.util.Map;
@@ -8,6 +8,10 @@ import java.util.concurrent.Executor;
 public class ConnectionWrapper implements Connection {
 
     private Connection connection;
+
+    public ConnectionWrapper(Connection connection) {
+        this.connection = connection;
+    }
 
     @Override
     public void close() throws SQLException {
