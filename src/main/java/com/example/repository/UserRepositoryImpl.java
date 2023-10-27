@@ -52,23 +52,4 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    public static void main(String[] args) {
-
-        UserRepositoryImpl repository = new UserRepositoryImpl();
-        List<User> users = repository.findAll();
-
-//        User user = new User(3L, "11111", "pass", "chakun", "polya", UserStatus.ADMIN, LocalDate.of(2014, Month.JANUARY, 1), false);
-//        org.repository.save(user);
-
-        System.out.println(
-                users
-        );
-
-//        org.repository.deleteById(6);
-
-//        System.out.println(
-//                org.repository.getById(1)
-//        );
-
-    }
 }

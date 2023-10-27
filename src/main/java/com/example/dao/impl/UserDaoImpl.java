@@ -126,7 +126,6 @@ public class UserDaoImpl implements UserDao {
         Connection connection = null;
         PreparedStatement statement = null;
 
-        User user = null;
         try {
             if (findById(id).isPresent()) {
                 statement = connection.prepareStatement("UPDATE users SET banned=true where id = ?;");

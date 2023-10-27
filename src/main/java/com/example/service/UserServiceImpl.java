@@ -11,24 +11,21 @@ import java.util.List;
 
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserServiceImpl() {
-
         this.userRepository = new UserRepositoryImpl();
     }
 
     @Override
-    public void add(String login, String password, String confirmedPassword, String firstname, String surname, Date birthDate, String email, String phoneNumber) {
+    public void add(String login, String password, String firstname, String surname, Date birthDate) {
     User user= User.builder()
             .login(login)
             .password(password)
             .firstName(firstname)
             .secondName(surname)
-//            .login(login)
-//            .login(login)
-//            .login(login)
-//            .login(login)
+            .birthDate(birthDate.toLocalDate())
+            .banned(false)
             .build();
         try {
              userRepository.save(user);
