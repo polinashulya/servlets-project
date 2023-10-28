@@ -1,5 +1,5 @@
 body {
-    background-color: #f6f6ff;
+    background-color: #eaf1dd;
     font-family: Calibri, Myriad;
 }
 
@@ -23,6 +23,17 @@ table.timecard caption {
     font-size: x-large;
     font-weight: bold;
     letter-spacing: .3em;
+}
+
+.delete-button {
+    width: 80%; /* Ширина кнопки составляет 80% ширины родительского элемента */
+    height: 30px; /* Увеличена высота */
+    margin: 0;
+    background-color: #dc6f6f;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
 }
 
 

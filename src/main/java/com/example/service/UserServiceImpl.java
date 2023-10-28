@@ -18,23 +18,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void add(String login, String password, String firstname, String surname, Date birthDate) {
-    User user= User.builder()
-            .login(login)
-            .password(password)
-            .firstName(firstname)
-            .secondName(surname)
-            .birthDate(birthDate.toLocalDate())
-            .banned(false)
-            .build();
-        try {
-             userRepository.save(user);
-        } catch (DAOException e) {
-            throw new ServiceException(e);
-        }
-    }
-
-    @Override
     public User getById(String userId) {
         return null;
     }
@@ -43,6 +26,15 @@ public class UserServiceImpl implements UserService {
     public List<User> getAll()  {
         try {
             return userRepository.findAll();
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
+    }
+
+    @Override
+    public void add(User user) {
+        try {
+            userRepository.save(user);
         } catch (DAOException e) {
             throw new ServiceException(e);
         }

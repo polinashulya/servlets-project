@@ -1,7 +1,12 @@
 <%@ page contentType="text/html;charset=windows-1251;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
-<body style="background-color: gainsboro">
+<head>
+    <style type="text/css">
+        <%@ include file="/WEB-INF/css/table.css" %>
+    </style>
+</head>
+<body>
 <%@ include file="/WEB-INF/header.jsp" %>
 <div id="main">
     <table class="timecard">
@@ -23,6 +28,12 @@
                         <td>${user.firstName}</td>
                         <td>${user.secondName}</td>
                         <td>${user.birthDate}</td>
+                        <td>
+                            <form action="deleteUser.jsp" method="delete">
+                                <input type="hidden" name="id" value="${user.id}" />
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 </c:forEach>
         </tbody>

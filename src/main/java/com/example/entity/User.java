@@ -19,5 +19,8 @@ public class User {
 
     private LocalDate birthDate;
     private boolean banned;
+    private boolean deleted;
+
+
 
 }

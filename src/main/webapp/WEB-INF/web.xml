@@ -21,6 +21,7 @@
         <servlet-name>UserServlet</servlet-name>
         <url-pattern>/users</url-pattern>
         <url-pattern>/userServlet</url-pattern>
+        <url-pattern>/add_user</url-pattern>
     </servlet-mapping>
 
 </web-app>

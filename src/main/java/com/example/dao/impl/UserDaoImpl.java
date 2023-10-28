@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
 
-    private static final String sql = "select id,login, password, first_name, second_name, birth_date, banned from users;";
+    private static final String sql = "select id,login, password, first_name, second_name, birth_date, banned, deleted from users WHERE deleted='false';";
     private final ConnectionPool connectionPool;
 
     public UserDaoImpl() {
@@ -101,7 +101,7 @@ public class UserDaoImpl implements UserDao {
 
         try {
             connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("INSERT INTO users (login, password, first_name, second_name, birth_date, banned ) VALUES (?,?,?,?,?,?);");
+            statement = connection.prepareStatement("INSERT INTO users (login, password, first_name, second_name, birth_date, banned, deleted ) VALUES (?,?,?,?,?,?,?);");
 
             statement.setString(1, user.getLogin());
             statement.setString(2, user.getPassword());
@@ -109,8 +109,9 @@ public class UserDaoImpl implements UserDao {
             statement.setString(4, user.getSecondName());
             statement.setDate(5, Date.valueOf(user.getBirthDate()));
             statement.setBoolean(6, user.isBanned());
+            statement.setBoolean(7, user.isDeleted());
 
-            ResultSet row = statement.executeQuery();
+            statement.executeUpdate();
 
         } catch (SQLException ex) {
             System.err.println();
@@ -128,7 +129,7 @@ public class UserDaoImpl implements UserDao {
 
         try {
             if (findById(id).isPresent()) {
-                statement = connection.prepareStatement("UPDATE users SET banned=true where id = ?;");
+                statement = connection.prepareStatement("UPDATE users SET deleted=true where id = ?;");
 
                 statement.setLong(1, id);
 
