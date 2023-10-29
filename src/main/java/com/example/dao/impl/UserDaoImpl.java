@@ -56,12 +56,12 @@ public class UserDaoImpl implements UserDao {
         User user = null;
         try {
             connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("select id, first_name from users where id = ?;");
+            statement = connection.prepareStatement("select * from users where id = ?;");
 
             statement.setLong(1, id);
 
             ResultSet set = statement.executeQuery();
-
+            System.out.println(set);
             if (set.next()) {
                 user = getUser(set);
             }
@@ -129,8 +129,8 @@ public class UserDaoImpl implements UserDao {
 
         try {
             if (findById(id).isPresent()) {
+                connection = connectionPool.getConnection();
                 statement = connection.prepareStatement("UPDATE users SET deleted=true where id = ?;");
-
                 statement.setLong(1, id);
 
                 int row = statement.executeUpdate();

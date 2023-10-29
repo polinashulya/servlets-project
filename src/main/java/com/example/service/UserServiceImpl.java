@@ -39,4 +39,13 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException(e);
         }
     }
+
+    @Override
+    public void deleteById(Long userId) {
+        try {
+            userRepository.deleteById(userId);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
+    }
 }

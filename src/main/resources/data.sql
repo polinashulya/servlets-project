@@ -9,6 +9,8 @@ insert into users(login,first_name) values ('login','polya');
 
 insert into users(login,first_name,second_name,birth_date) values ('login','polya','busya','1999-02-08');
 
+select * from users where id = 2;
+
 select * from users;
 
 

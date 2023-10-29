@@ -29,7 +29,12 @@
                         <td>${user.secondName}</td>
                         <td>${user.birthDate}</td>
                         <td>
-                            <form action="deleteUser.jsp" method="delete">
+<%--                            <form method="delete">--%>
+<%--                                <input type="hidden" name="id" value="${user.id}" />--%>
+<%--                                <button type="submit" class="delete-button" href="userServlet?action=delete_users">Delete</button>--%>
+<%--                            </form>--%>
+                            <form action="userServlet" method="post">
+                                <input type="hidden" name="action" value="delete_user" />
                                 <input type="hidden" name="id" value="${user.id}" />
                                 <button type="submit" class="delete-button">Delete</button>
                             </form>

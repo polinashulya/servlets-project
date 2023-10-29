@@ -45,30 +45,38 @@ public class UserServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) {
 
+        String page = "userServlet?action=users";
+
         try {
-            String page = "userServlet?action=users";
+            String action = req.getParameter("action");
 
-            String login = req.getParameter("login");
-            String password = req.getParameter("password");
-            String firstName = req.getParameter("firstName");
-            String secondName = req.getParameter("secondName");
-            String birthDate = req.getParameter("birthDate");
-
-
-            User user = User.builder()
-                    .login(login)
-                    .password(password)
-                    .firstName(firstName)
-                    .secondName(secondName)
-                    .birthDate(LocalDate.parse(birthDate))
-                    .banned(false)
-                    .deleted(false)
-                    .build();
+            if ("add_user".equals(action)) {
+                String login = req.getParameter("login");
+                String password = req.getParameter("password");
+                String firstName = req.getParameter("firstName");
+                String secondName = req.getParameter("secondName");
+                String birthDate = req.getParameter("birthDate");
 
 
-            userService.add(user);
-            req.setAttribute("user", user);
+                User user = User.builder()
+                        .login(login)
+                        .password(password)
+                        .firstName(firstName)
+                        .secondName(secondName)
+                        .birthDate(LocalDate.parse(birthDate))
+                        .banned(false)
+                        .deleted(false)
+                        .build();
 
+
+                userService.add(user);
+                req.setAttribute("user", user);
+
+            } else if ("delete_user".equals(action)) {
+
+                Long userId = Long.valueOf(req.getParameter("id"));
+                userService.deleteById(userId);
+            }
             resp.sendRedirect(page);
 
         } catch (Exception e) {
@@ -77,13 +85,18 @@ public class UserServlet extends HttpServlet {
 
     }
 
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        try {
-            List<User> users = userService.getAll();
 
-            req.setAttribute("users", users);
-            req.getRequestDispatcher("/WEB-INF/users.jsp").forward(req, resp);
+        String page = "userServlet?action=users";
+
+        try {
+            System.out.println("delete");
+            Long userId = Long.valueOf(req.getParameter("id"));
+            userService.deleteById(userId);
+
+            resp.sendRedirect(page);
 
         } catch (Exception e) {
             throw new ServletCustomException(e);
