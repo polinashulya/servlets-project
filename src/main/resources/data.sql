@@ -18,3 +18,4 @@ select id, first_name from users where id = 6;
 UPDATE users  SET banned=false where id= 6;
 -- comment
 
+select * from users where first_name like 'P%' order by id DESC ;

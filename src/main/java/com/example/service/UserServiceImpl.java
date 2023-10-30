@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void add(User user) {
         try {
+            // валидация епта
             userRepository.save(user);
         } catch (DAOException e) {
             throw new ServiceException(e);

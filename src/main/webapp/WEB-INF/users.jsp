@@ -12,35 +12,31 @@
     <table class="timecard">
         <caption>Users</caption>
         <thead>
-            <tr>
-                <th id="id">User`s id</th>
-                <th id="login">Login</th>
-                <th id="firstName">First name</th>
-                <th id="secondName">Second name</th>
-                <th id="birthDate">Birth date</th>
-            </tr>
+        <tr>
+            <th id="id">User`s id</th>
+            <th id="login">Login</th>
+            <th id="firstName">First name</th>
+            <th id="secondName">Second name</th>
+            <th id="birthDate">Birth date</th>
+        </tr>
         </thead>
         <tbody>
-                <c:forEach items="${users}" var="user">
-                    <tr>
-                        <td>${user.id}</td>
-                        <td>${user.login}</td>
-                        <td>${user.firstName}</td>
-                        <td>${user.secondName}</td>
-                        <td>${user.birthDate}</td>
-                        <td>
-<%--                            <form method="delete">--%>
-<%--                                <input type="hidden" name="id" value="${user.id}" />--%>
-<%--                                <button type="submit" class="delete-button" href="userServlet?action=delete_users">Delete</button>--%>
-<%--                            </form>--%>
-                            <form action="userServlet" method="post">
-                                <input type="hidden" name="action" value="delete_user" />
-                                <input type="hidden" name="id" value="${user.id}" />
-                                <button type="submit" class="delete-button">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                </c:forEach>
+        <c:forEach items="${users}" var="user">
+            <tr>
+                <td>${user.id}</td>
+                <td>${user.login}</td>
+                <td>${user.firstName}</td>
+                <td>${user.secondName}</td>
+                <td>${user.birthDate}</td>
+                <td>
+                    <form action="mainServlet?action=delete_user" method="post">
+                        <input type="hidden" name="action" value="delete_user"/>
+                        <input type="hidden" name="id" value="${user.id}"/>
+                        <button type="submit" class="delete-button">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
 </div>

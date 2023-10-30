@@ -10,7 +10,7 @@ import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
 
-    private UserDao userDao;
+    private final UserDao userDao;
 
     public UserRepositoryImpl() {
         userDao = new UserDaoImpl();

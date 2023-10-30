@@ -10,8 +10,8 @@
 <header class="header">
     <div class="button-container">
         <a class="button" href="mainServlet">Main page</a>
-        <a class="button" href="userServlet?action=users">Show all users</a>
-        <a class="button" href="userServlet?action=add_user">Add new user</a>
+        <a class="button" href="mainServlet?action=users">Show all users</a>
+        <a class="button" href="mainServlet?action=adding_form">Add new user</a>
     </div>
 </header>
 </body>

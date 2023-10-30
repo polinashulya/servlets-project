@@ -7,7 +7,7 @@
 <body style="background-color: gainsboro">
 <%@ include file="/WEB-INF/header.jsp" %>
 <h1>Add new user</h1>
-<form method="POST">
+<form action="mainServlet?action=add_user" method="POST">
     Login :
     <input type="text" name="login" required="required" value="<c:out value="${user.login}" />"/>
     <br/>

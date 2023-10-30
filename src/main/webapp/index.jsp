@@ -7,6 +7,7 @@
 <body style="background-color: gainsboro">
 
 <h1>Welcome to the main page</h1>
+<c:redirect url = "mainWindow?action=main"/>
 <%@ include file="/WEB-INF/footer.jsp" %>
 </body>
 </html>

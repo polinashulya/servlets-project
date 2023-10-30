@@ -21,7 +21,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findAll()  {
+    public List<User> findAll() {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -49,7 +49,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public User getById(long id)  {
+    public User getById(long id) {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -77,7 +77,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> findById(long id)  {
+    public Optional<User> findById(long id) {
         return Optional.ofNullable(getById(id));
     }
 
@@ -95,7 +95,7 @@ public class UserDaoImpl implements UserDao {
 
 
     @Override
-    public void save(User user)  {
+    public void save(User user) {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -123,7 +123,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public void delete(long id)  {
+    public void delete(long id) {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -133,10 +133,10 @@ public class UserDaoImpl implements UserDao {
                 statement = connection.prepareStatement("UPDATE users SET deleted=true where id = ?;");
                 statement.setLong(1, id);
 
-                int row = statement.executeUpdate();
-
+                statement.executeUpdate();
+            } else {
+                throw new DAOException("User with id = " + id + " was not found!");
             }
-
         } catch (SQLException ex) {
             System.err.println();
             throw new DAOException(ex);
@@ -151,7 +151,7 @@ public class UserDaoImpl implements UserDao {
             try {
                 connection.close();
             } catch (Exception ex) {
-                //todo should i throw org.exception or just log?
+
             }
         }
         if (statement != null) {
