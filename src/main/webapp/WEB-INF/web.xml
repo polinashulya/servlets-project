@@ -14,14 +14,21 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>UserServlet</servlet-name>
-        <servlet-class>com.example.servlet.UserServlet</servlet-class>
+        <servlet-name>users</servlet-name>
+        <jsp-file>/WEB-INF/users.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
-        <servlet-name>UserServlet</servlet-name>
+        <servlet-name>users</servlet-name>
         <url-pattern>/users</url-pattern>
-        <url-pattern>/userServlet</url-pattern>
-        <url-pattern>/add_user</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>adding_form</servlet-name>
+        <jsp-file>/WEB-INF/add_user.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>adding_form</servlet-name>
+        <url-pattern>/adding_form</url-pattern>
     </servlet-mapping>
 
 </web-app>

@@ -34,7 +34,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void add(User user) {
         try {
+            // валидация епта
             userRepository.save(user);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
+    }
+
+    @Override
+    public void deleteById(Long userId) {
+        try {
+            userRepository.deleteById(userId);
         } catch (DAOException e) {
             throw new ServiceException(e);
         }
