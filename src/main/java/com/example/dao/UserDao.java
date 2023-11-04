@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
-    List<User> findAll() ;
+    List<User> findAll(String sql);
 
-    User getById(long id) ;
+    User getById(long id);
 
-    Optional<User> findById(long id) ;
+    Optional<User> findById(long id);
 
-    void  save(User user) ;
+    void save(User user);
 
-    void delete(long id) ; // todo should be soft (not truly delete, just deactivate)
+    void delete(long id); // todo should be soft (not truly delete, just deactivate)
+
+    String getSortingSql(String sortedBy, String sortType);
 
 }

@@ -31,16 +31,16 @@ public class AddUserCommand implements Command {
         try {
             String login = request.getParameter("login");
             String password = request.getParameter("password");
-            String firstName = request.getParameter("firstName");
-            String secondName = request.getParameter("secondName");
+            String firstname = request.getParameter("firstname");
+            String surname = request.getParameter("surname");
             String birthDate = request.getParameter("birthDate");
 
 
             User user = User.builder()
                     .login(login)
                     .password(password)
-                    .firstName(firstName)
-                    .secondName(secondName)
+                    .firstname(firstname)
+                    .surname(surname)
                     .birthDate(LocalDate.parse(birthDate))
                     .banned(false)
                     .deleted(false)
@@ -53,6 +53,6 @@ public class AddUserCommand implements Command {
         } catch (Exception e) {
             throw new ServletCustomException(e);
         }
-        return "/WEB-INF/users.jsp";
+        return "mainServlet?action=users";
     }
 }

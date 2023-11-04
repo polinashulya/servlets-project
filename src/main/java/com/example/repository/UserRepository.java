@@ -4,14 +4,14 @@ import com.example.entity.User;
 
 import java.util.List;
 
-public interface UserRepository  {
+public interface UserRepository {
 
-    List<User> findAll() ;
+    List<User> findAll(String sortBy, String sortType);
 
-    User getById(long id) ;
+    User getById(long id);
 
-     void save(User user) ;
+    void save(User user);
 
-     void deleteById(long id) ;
+    void deleteById(long id);
 
 }

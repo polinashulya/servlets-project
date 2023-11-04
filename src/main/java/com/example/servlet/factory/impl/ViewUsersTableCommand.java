@@ -27,22 +27,23 @@ public class ViewUsersTableCommand implements Command {
 
     @Override
     public String execute() throws CommandException {
-
-        final String action = request.getParameter("action");
-        String page;
-
         try {
-            if (("adding_form").equals(action)) {
-               page="/WEB-INF/add_user.jsp";
-            } else {
-                List<User> users = userService.getAll();
+            String sortBy = request.getParameter("sortBy");
+            String sortType = request.getParameter("sortType");
 
-                request.setAttribute("users", users);
-                page="/WEB-INF/users.jsp";
-            }
+            List<User> users = userService.getAll(sortBy, sortType);
+
+            request.setAttribute("users", users);
+            request.setAttribute("sortBy", sortBy);
+            request.setAttribute("sortType", sortType);
+
+
+            //
+
+            return "/WEB-INF/users.jsp";
         } catch (ServiceException e) {
             throw new CommandException(e);
         }
-        return page;
+
     }
 }

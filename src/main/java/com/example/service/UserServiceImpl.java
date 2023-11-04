@@ -23,9 +23,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll()  {
+    public List<User> getAll(String sortBy, String sortType) {
         try {
-            return userRepository.findAll();
+            return userRepository.findAll(sortBy, sortType);
         } catch (DAOException e) {
             throw new ServiceException(e);
         }
@@ -49,4 +49,5 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException(e);
         }
     }
+
 }

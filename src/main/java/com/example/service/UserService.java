@@ -11,9 +11,10 @@ public interface UserService {
 
     User getById(String userId);
 
-    List<User> getAll();
+    List<User> getAll(String sortBy, String sortType);
 
     void add(User user);
 
     void deleteById(Long userId);
+
 }

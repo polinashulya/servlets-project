@@ -9,14 +9,39 @@
 <body>
 <%@ include file="/WEB-INF/header.jsp" %>
 <div id="main">
+    <form action="mainServlet?action=users" method="get">
+
+        <label for="sortBy">Sort By:</label>
+        <select name="sortBy" id="sortBy">
+            <option value="byId"  <c:if test="${sortType == 'byId'}">selected</c:if>>ID</option>
+            <option value="byLogin"  <c:if test="${sortType == 'byLogin'}">selected</c:if>>Login</option>
+            <option value="bySurname"  <c:if test="${sortType == 'bySurname'}">selected</c:if>>Surname</option>
+            <option value="byBirthDate"  <c:if test="${sortType == 'byBirthDate'}">selected</c:if>>Birth Date</option>
+        </select>
+
+        <label for="sortType">Sort Type:</label>
+        <select name="sortType" id="sortType">
+            <option value="ASC" <c:if test="${sortType == 'ASC'}">selected</c:if>>
+                Ascending
+            </option>
+            <option value="DESC" <c:if test="${sortType == 'DESC'}">selected</c:if>>
+                Descending
+            </option>
+        </select>
+
+        <input type="submit" value="Show">
+
+        <input hidden="hidden" name="action" value="users">
+    </form>
+
     <table class="timecard">
         <caption>Users</caption>
         <thead>
         <tr>
             <th id="id">User`s id</th>
             <th id="login">Login</th>
-            <th id="firstName">First name</th>
-            <th id="secondName">Second name</th>
+            <th id="firstName">Firstname</th>
+            <th id="secondName">Surname</th>
             <th id="birthDate">Birth date</th>
         </tr>
         </thead>
@@ -25,8 +50,8 @@
             <tr>
                 <td>${user.id}</td>
                 <td>${user.login}</td>
-                <td>${user.firstName}</td>
-                <td>${user.secondName}</td>
+                <td>${user.firstname}</td>
+                <td>${user.surname}</td>
                 <td>${user.birthDate}</td>
                 <td>
                     <form action="mainServlet?action=delete_user" method="post">

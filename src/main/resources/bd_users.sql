@@ -1,1 +1,1 @@
-create table users(id serial, login character(20), password character(20), first_name character(20), second_name character(20), birth_date date, banned bool, deleted bool);
+create table users(id serial, login character(20), password character(20), firstname character(20), surname character(20), birth_date date, banned bool, deleted bool);

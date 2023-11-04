@@ -13,8 +13,8 @@ public class User {
     private String login;
     private String password;
 
-    private String firstName;
-    private String secondName;
+    private String firstname;
+    private String surname;
     private UserStatus userStatus;
 
     private LocalDate birthDate;

@@ -30,6 +30,6 @@ public class DeleteUserCommand implements Command {
         } catch (Exception e) {
             throw new ServletCustomException(e);
         }
-        return "/WEB-INF/users.jsp";
+        return "mainServlet?action=users";
     }
 }

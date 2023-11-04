@@ -17,9 +17,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findAll(String sortBy, String sortType) {
         try {
-            return userDao.findAll();
+            final String sql = userDao.getSortingSql(sortBy, sortType);
+            return userDao.findAll(sql);
         } catch (DAOException e) {
             throw new RepositoryException(e);
         }

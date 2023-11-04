@@ -16,12 +16,12 @@
     <input type="text" name="password" required="required" value="<c:out value="${user.password}" />"/>
     <br/>
 
-    First name :
-    <input type="text" name="firstName" required="required" value="<c:out value="${user.firstName}" />"/>
+    Firstname :
+    <input type="text" name="firstname" required="required" value="<c:out value="${user.firstame}" />"/>
     <br/>
 
-    Second name :
-    <input type="text" name="secondName" required="required" value="<c:out value="${user.secondName}" />"/>
+    Surname :
+    <input type="text" name="surname" required="required" value="<c:out value="${user.surname}" />"/>
     <br/>
 
     Birth date :
