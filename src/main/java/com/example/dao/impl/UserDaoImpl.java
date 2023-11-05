@@ -75,8 +75,8 @@ public class UserDaoImpl implements UserDao {
         User user = null;
         try {
             connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id " +
-                    "FROM users u join countries c on u.country_id = c.id where id = ?;");
+            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                    "FROM users u join countries c on u.country_id = c.id where u.id = ?;");
 
             statement.setLong(1, id);
 
@@ -156,7 +156,7 @@ public class UserDaoImpl implements UserDao {
         try {
             if (findById(id).isPresent()) {
                 connection = connectionPool.getConnection();
-                statement = connection.prepareStatement("UPDATE users SET deleted=true where id = ?;");
+                statement = connection.prepareStatement("UPDATE users u SET deleted=true where u.id = ?;");
                 statement.setLong(1, id);
 
                 statement.executeUpdate();

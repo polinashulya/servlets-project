@@ -24,7 +24,7 @@ public class DeleteUserCommand implements Command {
     public String execute() throws CommandException {
 
         try {
-            Long userId = Long.valueOf(request.getParameter("id"));
+            Long userId = Long.valueOf(request.getParameter("userId"));
             userService.deleteById(userId);
 
         } catch (Exception e) {

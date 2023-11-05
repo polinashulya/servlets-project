@@ -67,3 +67,5 @@ SELECT u.id, u.login, u.firstname, u.surname, u.country_id, u.birth_date, u.bann
 FROM users u
          join countries c on u.country_id = c.id
 WHERE u.deleted = 'false';
+
+UPDATE users u SET deleted=false where u.id=10

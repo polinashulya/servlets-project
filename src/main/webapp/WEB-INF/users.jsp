@@ -72,7 +72,7 @@
                 <td>
                     <form action="mainServlet?action=delete_user" method="post">
                         <input type="hidden" name="action" value="delete_user"/>
-                        <input type="hidden" name="id" value="${user.id}"/>
+                        <input type="hidden" name="userId" value="${user.id}"/>
                         <button type="submit" class="delete-button">Delete</button>
                     </form>
                 </td>
