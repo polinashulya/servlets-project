@@ -1,12 +1,12 @@
-package com.example.service;
+package com.example.service.impl;
 
 import com.example.entity.User;
 import com.example.exception.DAOException;
 import com.example.exception.ServiceException;
 import com.example.repository.UserRepository;
-import com.example.repository.UserRepositoryImpl;
+import com.example.repository.impl.UserRepositoryImpl;
+import com.example.service.UserService;
 
-import java.sql.Date;
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
@@ -23,9 +23,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll(String sortBy, String sortType) {
+    public List<User> getAll(String sortBy, String sortType, String countryId) {
         try {
-            return userRepository.findAll(sortBy, sortType);
+            return userRepository.findAll(sortBy, sortType, countryId);
         } catch (DAOException e) {
             throw new ServiceException(e);
         }

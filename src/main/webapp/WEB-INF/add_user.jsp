@@ -24,6 +24,18 @@
     <input type="text" name="surname" required="required" value="<c:out value="${user.surname}" />"/>
     <br/>
 
+    <label for="country"> Country: </label>
+    <select id="country" name="countryId">
+        <option disabled selected value> -- select an option --</option>
+        <c:forEach items="${countries}" var="country">
+            <option value="${country.id}">
+                    ${country.name}
+            </option>
+        </c:forEach>
+        <option value="">none</option>
+    </select>
+
+    <br/>
     Birth date :
     <input type="text" name="birthDate" required="required" value="<c:out value="${user.birthDate}" />"/>
     <br/>

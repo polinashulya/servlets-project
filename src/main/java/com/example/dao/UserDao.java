@@ -16,6 +16,6 @@ public interface UserDao {
 
     void delete(long id); // todo should be soft (not truly delete, just deactivate)
 
-    String getSortingSql(String sortedBy, String sortType);
+    String getSortingAndFilteringSql(String sortBy, String sortType, String countryId);
 
 }

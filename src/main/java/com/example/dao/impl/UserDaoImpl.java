@@ -1,111 +1,31 @@
 package com.example.dao.impl;
 
-import com.example.entity.User;
 import com.example.dao.ConnectionPool;
 import com.example.dao.UserDao;
+import com.example.entity.Country;
+import com.example.entity.User;
 import com.example.exception.DAOException;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+
+import static com.example.dao.impl.DaoHelper.closeConnection;
 
 public class UserDaoImpl implements UserDao {
 
-    private static final String FIND_ALL_USERS = "select id, login, password, firstname, surname, birth_date, banned, deleted from users WHERE deleted='false';";
+    private static final String FIND_ALL_USERS =
+            "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                    "FROM users u " +
+                    "join countries c on u.country_id = c.id " +
+                    "WHERE u.deleted = 'false' ";
     static final String SORT_TYPE_ASC = "ASC";
-    static final String SORT_USERS_BY_ID= "byId";
+    static final String SORT_USERS_BY_ID = "byId";
     static final String SORT_USERS_BY_SURNAME = "bySurname";
     static final String SORT_USERS_BY_LOGIN = "byLogin";
     static final String SORT_USERS_BY_BIRTH_DATE = "byBirthDate";
-    private static final String GET_ALL_USERS_SORTED_BY_LOGIN_ASC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY login ASC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_LOGIN_DESC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY login DESC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_BIRTH_DATE_ASC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY birth_date ASC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_BIRTH_DATE_DESC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY birth_date DESC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_SURNAME_ASC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY surname DESC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_SURNAME_DESC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM Users u" +
-                    " ORDER BY surname DESC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_ID_ASC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY id ASC";
-
-    private static final String GET_ALL_USERS_SORTED_BY_ID_DESC =
-            "SELECT " +
-                    "u.id," +
-                    "u.login," +
-                    "u.firstname," +
-                    "u.surname," +
-                    "u.birth_date," +
-                    "u.banned" +
-                    " FROM users u" +
-                    " ORDER BY id DESC";
 
 
     private final ConnectionPool connectionPool;
@@ -155,7 +75,8 @@ public class UserDaoImpl implements UserDao {
         User user = null;
         try {
             connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("select * from users where id = ?;");
+            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id " +
+                    "FROM users u join countries c on u.country_id = c.id where id = ?;");
 
             statement.setLong(1, id);
 
@@ -188,6 +109,12 @@ public class UserDaoImpl implements UserDao {
                 .surname(set.getString(4))
                 .birthDate((set.getDate(5)).toLocalDate())
                 .banned(set.getBoolean(6))
+                .country(
+                        Country.builder()
+                                .id(set.getLong(7))
+                                .name(set.getString(8))
+                                .build()
+                )
                 .build();
     }
 
@@ -199,7 +126,7 @@ public class UserDaoImpl implements UserDao {
 
         try {
             connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("INSERT INTO users (login, password, firstname, surname, birth_date, banned, deleted ) VALUES (?,?,?,?,?,?,?);");
+            statement = connection.prepareStatement("INSERT INTO users (login, password, firstname, surname, birth_date, banned, deleted, country_id ) VALUES (?,?,?,?,?,?,?, ?);");
 
             statement.setString(1, user.getLogin());
             statement.setString(2, user.getPassword());
@@ -208,6 +135,7 @@ public class UserDaoImpl implements UserDao {
             statement.setDate(5, Date.valueOf(user.getBirthDate()));
             statement.setBoolean(6, user.isBanned());
             statement.setBoolean(7, user.isDeleted());
+            statement.setLong(8, user.getCountry().getId());
 
             statement.executeUpdate();
 
@@ -247,48 +175,42 @@ public class UserDaoImpl implements UserDao {
     private static String getSortByOrDefault(String sortBy) {
         return sortBy == null ? "default" : sortBy;
     }
+
     @Override
-    public String getSortingSql(String sortBy, String sortType) {
+    public String getSortingAndFilteringSql(String sortBy, String sortType, String countryId) {
+
+        String filteringSql = " ";
+
+        if (countryId != null && !countryId.isEmpty()) {
+            filteringSql = "AND u.country_id = " + countryId;
+        }
+
         switch (getSortByOrDefault(sortBy)) {
             case SORT_USERS_BY_LOGIN -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        GET_ALL_USERS_SORTED_BY_LOGIN_ASC :
-                        GET_ALL_USERS_SORTED_BY_LOGIN_DESC;
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.login ASC" :
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.login DESC";
             }
             case SORT_USERS_BY_SURNAME -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        GET_ALL_USERS_SORTED_BY_SURNAME_ASC :
-                        GET_ALL_USERS_SORTED_BY_SURNAME_DESC;
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.surname ASC" :
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.surname DESC";
             }
             case SORT_USERS_BY_BIRTH_DATE -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        GET_ALL_USERS_SORTED_BY_BIRTH_DATE_ASC :
-                        GET_ALL_USERS_SORTED_BY_BIRTH_DATE_DESC;
-            } case SORT_USERS_BY_ID -> {
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.birth_date ASC" :
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.birth_date DESC";
+            }
+            case SORT_USERS_BY_ID -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        GET_ALL_USERS_SORTED_BY_ID_ASC :
-                        GET_ALL_USERS_SORTED_BY_ID_DESC;
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.id ASC" :
+                        FIND_ALL_USERS + filteringSql + " ORDER BY u.id DESC";
             }
             default -> {
-                return GET_ALL_USERS_SORTED_BY_ID_ASC;
+                return FIND_ALL_USERS + filteringSql + " ORDER BY u.id ASC";
             }
         }
     }
 
-    private static void closeConnection(Connection connection, PreparedStatement statement) {
-        if (connection != null) {
-            try {
-                connection.close();
-            } catch (Exception ex) {
 
-            }
-        }
-        if (statement != null) {
-            try {
-                statement.close();
-            } catch (Exception ex) {
-
-            }
-        }
-    }
 }

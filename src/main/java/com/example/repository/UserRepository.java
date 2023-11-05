@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface UserRepository {
 
-    List<User> findAll(String sortBy, String sortType);
+    List<User> findAll(String sortBy, String sortType, String countryId);
 
     User getById(long id);
 

@@ -11,7 +11,7 @@ public interface UserService {
 
     User getById(String userId);
 
-    List<User> getAll(String sortBy, String sortType);
+    List<User> getAll(String sortBy, String sortType, String countryId);
 
     void add(User user);
 

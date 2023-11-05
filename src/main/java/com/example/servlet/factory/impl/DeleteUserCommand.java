@@ -3,7 +3,7 @@ package com.example.servlet.factory.impl;
 import com.example.exception.CommandException;
 import com.example.exception.ServletCustomException;
 import com.example.service.UserService;
-import com.example.service.UserServiceImpl;
+import com.example.service.impl.UserServiceImpl;
 import com.example.servlet.Command;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

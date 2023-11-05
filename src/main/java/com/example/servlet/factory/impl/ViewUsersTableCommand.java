@@ -1,10 +1,13 @@
 package com.example.servlet.factory.impl;
 
+import com.example.entity.Country;
 import com.example.entity.User;
 import com.example.exception.CommandException;
 import com.example.exception.ServiceException;
+import com.example.service.CountryService;
+import com.example.service.impl.CountryServiceImpl;
 import com.example.service.UserService;
-import com.example.service.UserServiceImpl;
+import com.example.service.impl.UserServiceImpl;
 import com.example.servlet.Command;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,12 +19,14 @@ public class ViewUsersTableCommand implements Command {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final UserService userService;
+    private final CountryService countryService;
 
     public ViewUsersTableCommand(final HttpServletRequest request,
                                  final HttpServletResponse response) {
         this.request = request;
         this.response = response;
         this.userService = new UserServiceImpl();
+        countryService = new CountryServiceImpl();
     }
 
 
@@ -30,15 +35,17 @@ public class ViewUsersTableCommand implements Command {
         try {
             String sortBy = request.getParameter("sortBy");
             String sortType = request.getParameter("sortType");
+            String countryId = request.getParameter("countryId");
 
-            List<User> users = userService.getAll(sortBy, sortType);
+            List<User> users = userService.getAll(sortBy, sortType, countryId);
 
             request.setAttribute("users", users);
             request.setAttribute("sortBy", sortBy);
             request.setAttribute("sortType", sortType);
+            request.setAttribute("currentCountryId", countryId);
 
-
-            //
+            List<Country> countries = this.countryService.findAll();
+            request.setAttribute("countries", countries);
 
             return "/WEB-INF/users.jsp";
         } catch (ServiceException e) {
