@@ -1,13 +1,15 @@
 package com.example.repository.impl;
 
+import com.example.dao.UserDao;
 import com.example.dao.impl.UserDaoImpl;
 import com.example.entity.User;
-import com.example.exception.RepositoryException;
-import com.example.dao.UserDao;
 import com.example.exception.DAOException;
+import com.example.exception.RepositoryException;
+import com.example.exception.ServiceException;
 import com.example.repository.UserRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public class UserRepositoryImpl implements UserRepository {
 
@@ -18,10 +20,10 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> findAll(String sortBy, String sortType, String countryId) {
+    public List<User> findAll(String sortBy, String sortType, String countryId, String search, String page, String pageSize) {
         try {
-            final String sortAndFilterSql = userDao.getSortingAndFilteringSql(sortBy, sortType, countryId);
-            return userDao.findAll(sortAndFilterSql);
+            final String sql = userDao.getSql(sortBy, sortType, countryId, search);
+            return userDao.findAll(sql, page, pageSize);
         } catch (DAOException e) {
             throw new RepositoryException(e);
         }
@@ -54,4 +56,22 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
+    @Override
+    public int getTotalResult(String sortBy, String sortType, String countryId, String search) {
+        try {
+            final String sql = userDao.getSql(sortBy, sortType, countryId, search);
+            return userDao.getTotalResult(sql);
+        } catch (DAOException e) {
+            throw new RepositoryException(e);
+        }
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        try {
+            return userDao.findByLogin(login);
+        } catch (DAOException e) {
+            throw new ServiceException(e);
+        }
+    }
 }

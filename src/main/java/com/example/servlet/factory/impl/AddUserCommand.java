@@ -39,10 +39,10 @@ public class AddUserCommand implements Command {
 
 
             User user = User.builder()
-                    .login(login)
+                    .login(login.trim())
                     .password(password)
-                    .firstname(firstname)
-                    .surname(surname)
+                    .firstname(firstname.trim())
+                    .surname(surname.trim())
                     .country(
                             Country.builder()
                                     .id(countryId)
@@ -55,6 +55,7 @@ public class AddUserCommand implements Command {
 
 
             userService.add(user);
+
             request.setAttribute("user", user);
 
         } catch (Exception e) {

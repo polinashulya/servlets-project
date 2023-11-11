@@ -9,7 +9,6 @@ import com.example.exception.DAOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static com.example.dao.impl.DaoHelper.closeConnection;
@@ -36,9 +35,17 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findAll(String sql) {
+    public List<User> findAll(String sql, String page, String pageSize) {
         Connection connection = null;
         PreparedStatement statement = null;
+
+        String paginationSql = new String();
+        int offset = 0;
+        if (page != null && !page.isEmpty() && pageSize != null && !pageSize.isEmpty()) {
+            offset = (Integer.parseInt(page) - 1) * Integer.parseInt(pageSize);
+            paginationSql = " LIMIT " + pageSize + " OFFSET " + offset;
+        } else paginationSql = " LIMIT " + 5 + " OFFSET " + 0;
+
 
         List<User> users = new ArrayList<>();
 
@@ -46,9 +53,9 @@ public class UserDaoImpl implements UserDao {
             connection = connectionPool.getConnection();
 
             if (sql.isEmpty()) {
-                sql = FIND_ALL_USERS;
+                sql = FIND_ALL_USERS + paginationSql;
             }
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql + paginationSql);
 
             ResultSet set = statement.executeQuery();
 
@@ -57,6 +64,7 @@ public class UserDaoImpl implements UserDao {
 
                 users.add(user);
             }
+
 
         } catch (SQLException ex) {
             throw new DAOException(ex);
@@ -99,6 +107,40 @@ public class UserDaoImpl implements UserDao {
     @Override
     public Optional<User> findById(long id) {
         return Optional.ofNullable(getById(id));
+    }
+
+    @Override
+    public User getByLogin(String login) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        User user = null;
+        try {
+            connection = connectionPool.getConnection();
+            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                    "FROM users u join countries c on u.country_id = c.id where u.login = ?;");
+
+            statement.setString(1, login);
+
+            ResultSet set = statement.executeQuery();
+            System.out.println(set);
+            if (set.next()) {
+                user = getUser(set);
+            }
+
+        } catch (SQLException ex) {
+            System.err.println();
+            throw new DAOException(ex);
+        } finally {
+            closeConnection(connection, statement);
+        }
+
+        return user;
+    }
+
+    @Override
+    public Optional<User> findByLogin(String login) {
+        return Optional.ofNullable(getByLogin(login));
     }
 
     private static User getUser(ResultSet set) throws SQLException {
@@ -177,40 +219,83 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public String getSortingAndFilteringSql(String sortBy, String sortType, String countryId) {
+    public String getSql(String sortBy, String sortType, String countryId, String search) {
 
-        String filteringSql = " ";
+        String filterSql = new String();
+        String searchSql = new String();
 
         if (countryId != null && !countryId.isEmpty()) {
-            filteringSql = "AND u.country_id = " + countryId;
+            filterSql = " AND u.country_id = " + countryId;
+        }
+
+        if (search != null && !search.isEmpty()) {
+            searchSql = " AND (u.login LIKE '%" + search + "%'" +
+                    " OR u.firstname LIKE '%" + search + "%'" +
+                    " OR u.surname LIKE '%" + search + "%'" +
+                    " OR c.name LIKE '%" + search + "%')";
         }
 
         switch (getSortByOrDefault(sortBy)) {
             case SORT_USERS_BY_LOGIN -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.login ASC" :
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.login DESC";
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.login ASC" :
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.login DESC";
             }
             case SORT_USERS_BY_SURNAME -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.surname ASC" :
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.surname DESC";
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.surname ASC" :
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.surname DESC";
             }
             case SORT_USERS_BY_BIRTH_DATE -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.birth_date ASC" :
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.birth_date DESC";
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.birth_date ASC" :
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.birth_date DESC";
             }
             case SORT_USERS_BY_ID -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.id ASC" :
-                        FIND_ALL_USERS + filteringSql + " ORDER BY u.id DESC";
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id ASC" :
+                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id DESC";
             }
             default -> {
-                return FIND_ALL_USERS + filteringSql + " ORDER BY u.id ASC";
+                return FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id ASC";
             }
         }
     }
 
+    @Override
+    public int getTotalResult(String sql) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+
+        int totalResult = 0;
+
+        List<User> users = new ArrayList<>();
+
+        try {
+            connection = connectionPool.getConnection();
+
+            if (sql.isEmpty()) {
+                sql = FIND_ALL_USERS;
+            }
+            statement = connection.prepareStatement(sql);
+
+            ResultSet set = statement.executeQuery();
+
+            while (set.next()) {
+                User user = getUser(set);
+
+                users.add(user);
+            }
+
+            totalResult = users.size();
+
+        } catch (SQLException ex) {
+            throw new DAOException(ex);
+        } finally {
+            closeConnection(connection, statement);
+        }
+
+        return totalResult;
+    }
 
 }

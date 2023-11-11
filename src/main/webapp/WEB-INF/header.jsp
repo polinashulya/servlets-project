@@ -9,7 +9,7 @@
 <body>
 <header class="header">
     <div class="button-container">
-        <a class="button" href="mainServlet">Main page</a>
+        <a class="button" href="mainServlet?action=main_page">Main page</a>
         <a class="button" href="mainServlet?action=users">Show all users</a>
         <a class="button" href="mainServlet?action=adding_form">Add new user</a>
     </div>

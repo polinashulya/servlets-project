@@ -11,6 +11,12 @@
 <div id="main">
     <form action="mainServlet?action=users" method="get">
 
+            <input type="text" name="page" value="${param.page}" />
+
+            <input  type="text" name="totalResult" value="${totalResult}" />
+
+
+
         <label for="sortBy">Sort By:</label>
         <select name="sortBy" id="sortBy">
             <option value="byId" <c:if test="${sortType == 'byId'}">selected</c:if>>ID</option>
@@ -41,6 +47,33 @@
             <option value=""> none</option>
         </select>
 
+        <label for="searchText">Search:</label>
+        <input type="text" id="searchText" name="searchText" value="${param.searchText}" placeholder="Search text">
+
+        <!-- Поле для указания количества элементов на странице -->
+        <select name="pageSize" onchange="this.form.submit()">
+            <option value="5" <c:if test="${param.pageSize == 5}">selected</c:if>>5 per page</option>
+            <option value="10" <c:if test="${param.pageSize == 10}">selected</c:if>>10 per page</option>
+            <option value="20" <c:if test="${param.pageSize == 20}">selected</c:if>>20 per page</option>
+        </select>
+
+        <c:choose>
+            <c:when test="${param.page > 1}">
+                <button type="submit" name="page" value="${param.page - 1}">Previous</button>
+            </c:when>
+            <c:otherwise>
+                <button type="submit" name="page" value="1" disabled>Previous</button>
+            </c:otherwise>
+        </c:choose>
+
+        <c:choose>
+            <c:when test="${param.page * param.pageSize < totalResult}">
+                <button type="submit" name="page" value="${param.page + 1}">Next</button>
+            </c:when>
+            <c:otherwise>
+                <button type="submit" name="page" value="${param.page}" disabled>Next</button>
+            </c:otherwise>
+        </c:choose>
 
         <input type="submit" value="Show">
 
@@ -81,6 +114,6 @@
         </tbody>
     </table>
 </div>
-<%@ include file="/WEB-INF/footer.jsp" %>
+<%--<%@ include file="/WEB-INF/footer.jsp" %>--%>
 </body>
 </html>

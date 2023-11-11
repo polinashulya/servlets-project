@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
-    List<User> findAll(String sql);
+    List<User> findAll(String sql, String page, String pageSize);
 
     User getById(long id);
 
@@ -14,8 +14,14 @@ public interface UserDao {
 
     void save(User user);
 
-    void delete(long id); // todo should be soft (not truly delete, just deactivate)
+    void delete(long id);
 
-    String getSortingAndFilteringSql(String sortBy, String sortType, String countryId);
+    User getByLogin(String login);
+
+    Optional<User> findByLogin(String login);
+
+    String getSql(String sortBy, String sortType, String countryId, String search);
+
+    int getTotalResult(String sql);
 
 }

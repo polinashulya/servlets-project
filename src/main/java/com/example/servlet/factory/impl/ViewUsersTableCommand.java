@@ -5,8 +5,8 @@ import com.example.entity.User;
 import com.example.exception.CommandException;
 import com.example.exception.ServiceException;
 import com.example.service.CountryService;
-import com.example.service.impl.CountryServiceImpl;
 import com.example.service.UserService;
+import com.example.service.impl.CountryServiceImpl;
 import com.example.service.impl.UserServiceImpl;
 import com.example.servlet.Command;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,9 +36,17 @@ public class ViewUsersTableCommand implements Command {
             String sortBy = request.getParameter("sortBy");
             String sortType = request.getParameter("sortType");
             String countryId = request.getParameter("countryId");
+            String search = request.getParameter("searchText");
+            int totalUsers = 0;
 
-            List<User> users = userService.getAll(sortBy, sortType, countryId);
+            String page = request.getParameter("page");
+            String pageSize = request.getParameter("pageSize");
 
+            List<User> users = userService.getAll(sortBy, sortType, countryId, search, page, pageSize);
+
+            totalUsers = userService.getTotalResult(sortBy, sortType, countryId, search);
+
+            request.setAttribute("totalResult", totalUsers);
             request.setAttribute("users", users);
             request.setAttribute("sortBy", sortBy);
             request.setAttribute("sortType", sortType);
