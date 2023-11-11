@@ -26,6 +26,8 @@ public class UserDaoImpl implements UserDao {
     static final String SORT_USERS_BY_LOGIN = "byLogin";
     static final String SORT_USERS_BY_BIRTH_DATE = "byBirthDate";
 
+    static final String PAGINATION_DEFAULT = " LIMIT " + 5 + " OFFSET " + 0;
+
 
     private final ConnectionPool connectionPool;
 
@@ -39,12 +41,17 @@ public class UserDaoImpl implements UserDao {
         Connection connection = null;
         PreparedStatement statement = null;
 
-        String paginationSql = new String();
+        String paginationSql;
         int offset = 0;
+
         if (page != null && !page.isEmpty() && pageSize != null && !pageSize.isEmpty()) {
+
             offset = (Integer.parseInt(page) - 1) * Integer.parseInt(pageSize);
             paginationSql = " LIMIT " + pageSize + " OFFSET " + offset;
-        } else paginationSql = " LIMIT " + 5 + " OFFSET " + 0;
+
+        } else {
+            paginationSql = PAGINATION_DEFAULT;
+        }
 
 
         List<User> users = new ArrayList<>();

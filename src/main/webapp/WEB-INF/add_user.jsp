@@ -2,9 +2,6 @@
 <%@ page contentType="text/html;charset=windows-1251;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <html>
-<head>
-    <title>Adding book</title>
-</head>
 <body style="background-color: gainsboro">
 <%@ include file="/WEB-INF/header.jsp" %>
 <h1>Add new user</h1>
