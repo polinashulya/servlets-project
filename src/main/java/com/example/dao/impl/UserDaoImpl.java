@@ -20,13 +20,19 @@ public class UserDaoImpl implements UserDao {
                     "FROM users u " +
                     "join countries c on u.country_id = c.id " +
                     "WHERE u.deleted = 'false' ";
-    static final String SORT_TYPE_ASC = "ASC";
-    static final String SORT_USERS_BY_ID = "byId";
-    static final String SORT_USERS_BY_SURNAME = "bySurname";
-    static final String SORT_USERS_BY_LOGIN = "byLogin";
-    static final String SORT_USERS_BY_BIRTH_DATE = "byBirthDate";
+    private static final String SORT_TYPE_ASC = "ASC";
+    private static final String SORT_USERS_BY_ID = "byId";
+    private static final String SORT_USERS_BY_SURNAME = "bySurname";
+    private static final String SORT_USERS_BY_LOGIN = "byLogin";
+    private static final String SORT_USERS_BY_BIRTH_DATE = "byBirthDate";
 
-    static final String PAGINATION_DEFAULT = " LIMIT " + 5 + " OFFSET " + 0;
+    private static final String PAGINATION_DEFAULT = " LIMIT " + 5 + " OFFSET " + 0;
+
+    private static final String TOTAL_COUNT_USERS =
+            "SELECT COUNT(*) AS totalUsers " +
+                    "FROM users u " +
+                    "join countries c on u.country_id = c.id " +
+                    "WHERE u.deleted = 'false' ";
 
 
     private final ConnectionPool connectionPool;
@@ -37,7 +43,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public List<User> findAll(String sql, String page, String pageSize) {
+    public List<User> findAll(String filterAndSearchsql, String sortSql, String page, String pageSize) {
         Connection connection = null;
         PreparedStatement statement = null;
 
@@ -59,10 +65,7 @@ public class UserDaoImpl implements UserDao {
         try {
             connection = connectionPool.getConnection();
 
-            if (sql.isEmpty()) {
-                sql = FIND_ALL_USERS + paginationSql;
-            }
-            statement = connection.prepareStatement(sql + paginationSql);
+            statement = connection.prepareStatement(FIND_ALL_USERS + filterAndSearchsql + sortSql + paginationSql);
 
             ResultSet set = statement.executeQuery();
 
@@ -226,8 +229,9 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public String getSql(String sortBy, String sortType, String countryId, String search) {
+    public String getFilterAndSearchSql(String countryId, String search) {
 
+        String sql = new String();
         String filterSql = new String();
         String searchSql = new String();
 
@@ -242,59 +246,58 @@ public class UserDaoImpl implements UserDao {
                     " OR c.name LIKE '%" + search + "%')";
         }
 
+        sql = filterSql + searchSql;
+
+        return sql;
+    }
+
+    @Override
+    public String getSortingSql(String sortBy, String sortType) {
+
         switch (getSortByOrDefault(sortBy)) {
             case SORT_USERS_BY_LOGIN -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.login ASC" :
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.login DESC";
+                        " ORDER BY u.login ASC" :
+                        " ORDER BY u.login DESC";
             }
             case SORT_USERS_BY_SURNAME -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.surname ASC" :
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.surname DESC";
+                        " ORDER BY u.surname ASC" :
+                        " ORDER BY u.surname DESC";
             }
             case SORT_USERS_BY_BIRTH_DATE -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.birth_date ASC" :
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.birth_date DESC";
+                        " ORDER BY u.birth_date ASC" :
+                        " ORDER BY u.birth_date DESC";
             }
             case SORT_USERS_BY_ID -> {
                 return SORT_TYPE_ASC.equals(sortType) ?
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id ASC" :
-                        FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id DESC";
+                        " ORDER BY u.id ASC" :
+                        " ORDER BY u.id DESC";
             }
             default -> {
-                return FIND_ALL_USERS + searchSql + filterSql + " ORDER BY u.id ASC";
+                return " ORDER BY u.id ASC";
             }
         }
     }
 
     @Override
-    public int getTotalResult(String sql) {
+    public int getTotalResult(String filterAndSearchsql) {
         Connection connection = null;
         PreparedStatement statement = null;
 
         int totalResult = 0;
 
-        List<User> users = new ArrayList<>();
-
         try {
             connection = connectionPool.getConnection();
 
-            if (sql.isEmpty()) {
-                sql = FIND_ALL_USERS;
-            }
-            statement = connection.prepareStatement(sql);
+            statement = connection.prepareStatement(TOTAL_COUNT_USERS + filterAndSearchsql);
 
             ResultSet set = statement.executeQuery();
 
-            while (set.next()) {
-                User user = getUser(set);
-
-                users.add(user);
+            if (set.next()) {
+                totalResult = set.getInt("totalUsers");
             }
-
-            totalResult = users.size();
 
         } catch (SQLException ex) {
             throw new DAOException(ex);

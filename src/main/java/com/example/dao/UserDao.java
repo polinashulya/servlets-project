@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserDao {
-    List<User> findAll(String sql, String page, String pageSize);
+    List<User> findAll(String filterAndSearchsql,String sortSql, String page, String pageSize);
 
     User getById(long id);
 
@@ -20,8 +20,10 @@ public interface UserDao {
 
     Optional<User> findByLogin(String login);
 
-    String getSql(String sortBy, String sortType, String countryId, String search);
+    String getFilterAndSearchSql(String countryId, String search);
 
-    int getTotalResult(String sql);
+    String getSortingSql(String sortBy, String sortType);
+
+    int getTotalResult(String filterAndSearchsql);
 
 }

@@ -22,8 +22,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public List<User> findAll(String sortBy, String sortType, String countryId, String search, String page, String pageSize) {
         try {
-            final String sql = userDao.getSql(sortBy, sortType, countryId, search);
-            return userDao.findAll(sql, page, pageSize);
+            final String filterAndSearchSql = userDao.getFilterAndSearchSql(countryId, search);
+            final String sortSql = userDao.getSortingSql(sortBy, sortType);
+            return userDao.findAll(filterAndSearchSql, sortSql, page, pageSize);
         } catch (DAOException e) {
             throw new RepositoryException(e);
         }
@@ -59,8 +60,8 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public int getTotalResult(String sortBy, String sortType, String countryId, String search) {
         try {
-            final String sql = userDao.getSql(sortBy, sortType, countryId, search);
-            return userDao.getTotalResult(sql);
+            final String filterAndSearchSql = userDao.getFilterAndSearchSql(countryId, search);
+            return userDao.getTotalResult(filterAndSearchSql);
         } catch (DAOException e) {
             throw new RepositoryException(e);
         }
