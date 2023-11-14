@@ -7,11 +7,15 @@ import com.example.service.impl.CountryServiceImpl;
 import com.example.servlet.Command;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 public class ViewAddUserPageCommand implements Command {
 
+    private static final Logger logger = LogManager.getLogger(ViewAddUserPageCommand.class);
+    private static final String ADD_USER_JSP_PATH = "/WEB-INF/add_user.jsp";
     private final HttpServletRequest request;
     private final HttpServletResponse response;
 
@@ -27,10 +31,15 @@ public class ViewAddUserPageCommand implements Command {
 
     @Override
     public String execute() throws CommandException {
+        try {
+            List<Country> countries = this.countryService.findAll();
+            request.setAttribute("countries", countries);
 
-        List<Country> countries = this.countryService.findAll();
-        request.setAttribute("countries", countries);
-
-        return "/WEB-INF/add_user.jsp";
+            return ADD_USER_JSP_PATH;
+        } catch (Exception e) {
+            logger.error("Error while executing ViewAddUserPageCommand", e);
+            throw new CommandException("Error while executing ViewAddUserPageCommand", e);
+        }
     }
+
 }

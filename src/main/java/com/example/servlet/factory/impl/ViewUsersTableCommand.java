@@ -11,11 +11,15 @@ import com.example.service.impl.UserServiceImpl;
 import com.example.servlet.Command;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 
 public class ViewUsersTableCommand implements Command {
 
+    private static final Logger logger = LogManager.getLogger(ViewUsersTableCommand.class);
+    private static final String USERS_JSP_PATH = "/WEB-INF/users.jsp";
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final UserService userService;
@@ -55,9 +59,11 @@ public class ViewUsersTableCommand implements Command {
             List<Country> countries = this.countryService.findAll();
             request.setAttribute("countries", countries);
 
-            return "/WEB-INF/users.jsp";
-        } catch (ServiceException e) {
-            throw new CommandException(e);
+            return USERS_JSP_PATH;
+
+        } catch (Exception e) {
+            logger.error("Error while executing ViewUsersTableCommand", e);
+            throw new CommandException("Error while showing a new user", e);
         }
 
     }

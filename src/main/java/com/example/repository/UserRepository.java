@@ -9,13 +9,13 @@ public interface UserRepository {
 
     List<User> findAll(String sortBy, String sortType, String countryId, String search, String page, String pageSize);
 
-    User getById(long id);
+    User getById(Long id);
 
     Optional<User> findByLogin(String login);
 
     void save(User user);
 
-    void deleteById(long id);
+    void deleteById(Long id);
 
     int getTotalResult(String sortBy, String sortType, String countryId, String search);
 

@@ -8,12 +8,15 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
 @WebServlet("/mainWindow")
 public class MainServlet extends HttpServlet {
 
+    private static final Logger logger = LogManager.getLogger(MainServlet.class);
     public static final String ACTION_TYPE = "action";
     public static final String ERROR_PAGE = "error_page";
 
@@ -21,7 +24,7 @@ public class MainServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         final String action = getActionType(req);
-        System.out.println("DO_GET command name " + action);
+        logger.info("DO GET command name  " + action);
 
         try {
             final CommandFactory commandFactory = CommandFactoryImpl.getInstance();
@@ -30,10 +33,10 @@ public class MainServlet extends HttpServlet {
 
             req.getRequestDispatcher(path).forward(req, resp);
         } catch (Exception e) {
-            System.err.println();
-          //  resp.sendRedirect("/WEB-INF/error_page.jsp");
-            //resp.sendRedirect("error_page");
-        }
+        logger.error(e);
+        //  resp.sendRedirect("/WEB-INF/error_page.jsp");
+        //resp.sendRedirect("error_page");
+    }
     }
 
     private static String getActionType(HttpServletRequest req) {
@@ -45,7 +48,7 @@ public class MainServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         final String action = getActionType(req);
-        System.out.println("DO POST command name  " + action);
+        logger.info("DO POST command name  " + action);
 
         try {
             final CommandFactory commandFactory = CommandFactoryImpl.getInstance();
@@ -54,8 +57,8 @@ public class MainServlet extends HttpServlet {
 
             resp.sendRedirect(path);
         } catch (Exception e) {
-            System.err.println();
-            //resp.sendRedirect("/WEB-INF/error_page.jsp");
+            logger.error(e);
+            resp.sendRedirect("/WEB-INF/error_page.jsp");
      //       resp.sendRedirect("error_page");
         }
 

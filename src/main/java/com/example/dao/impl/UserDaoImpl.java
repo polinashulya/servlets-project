@@ -5,6 +5,9 @@ import com.example.dao.UserDao;
 import com.example.entity.Country;
 import com.example.entity.User;
 import com.example.exception.DAOException;
+import com.example.service.impl.UserServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -14,6 +17,8 @@ import java.util.Optional;
 import static com.example.dao.impl.DaoHelper.closeConnection;
 
 public class UserDaoImpl implements UserDao {
+
+    private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     private static final String FIND_ALL_USERS =
             "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
@@ -68,6 +73,7 @@ public class UserDaoImpl implements UserDao {
             statement = connection.prepareStatement(FIND_ALL_USERS + filterAndSearchsql + sortSql + paginationSql);
 
             ResultSet set = statement.executeQuery();
+            logger.debug("Executing query: {}", statement.toString());
 
             while (set.next()) {
                 User user = getUser(set);
@@ -77,6 +83,7 @@ public class UserDaoImpl implements UserDao {
 
 
         } catch (SQLException ex) {
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
@@ -99,13 +106,16 @@ public class UserDaoImpl implements UserDao {
             statement.setLong(1, id);
 
             ResultSet set = statement.executeQuery();
-            System.out.println(set);
+            logger.debug("Executing query: {}", statement.toString());
+
             if (set.next()) {
                 user = getUser(set);
+            } else {
+                logger.warn("No user found by id " + id);
             }
 
         } catch (SQLException ex) {
-            System.err.println();
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
@@ -133,13 +143,16 @@ public class UserDaoImpl implements UserDao {
             statement.setString(1, login);
 
             ResultSet set = statement.executeQuery();
-            System.out.println(set);
+            logger.debug("Executing query: {}", statement.toString());
+
             if (set.next()) {
                 user = getUser(set);
+            } else {
+                logger.warn("No user found with by login " + login);
             }
 
         } catch (SQLException ex) {
-            System.err.println();
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
@@ -190,9 +203,10 @@ public class UserDaoImpl implements UserDao {
             statement.setLong(8, user.getCountry().getId());
 
             statement.executeUpdate();
+            logger.debug("Executing query: {}", statement.toString());
 
         } catch (SQLException ex) {
-            System.err.println();
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);
@@ -212,10 +226,14 @@ public class UserDaoImpl implements UserDao {
                 statement.setLong(1, id);
 
                 statement.executeUpdate();
+                logger.debug("Executing query: {}", statement.toString());
+
             } else {
+                logger.debug("User with id = " + id + " was not found!");
                 throw new DAOException("User with id = " + id + " was not found!");
             }
         } catch (SQLException ex) {
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             System.err.println();
             throw new DAOException(ex);
         } finally {
@@ -294,12 +312,16 @@ public class UserDaoImpl implements UserDao {
             statement = connection.prepareStatement(TOTAL_COUNT_USERS + filterAndSearchsql);
 
             ResultSet set = statement.executeQuery();
+            logger.debug("Executing query: {}", statement.toString());
 
             if (set.next()) {
                 totalResult = set.getInt("totalUsers");
-            }
+            }  else {
+            logger.warn("The total result of users is null");
+        }
 
         } catch (SQLException ex) {
+            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
             closeConnection(connection, statement);

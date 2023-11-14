@@ -31,7 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public User getById(long id) {
+    public User getById(Long id) {
         try {
             return userDao.getById(id);
         } catch (DAOException e) {
@@ -49,7 +49,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void deleteById(long id) {
+    public void deleteById(Long id) {
         try {
             userDao.delete(id);
         } catch (DAOException e) {
@@ -72,7 +72,7 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             return userDao.findByLogin(login);
         } catch (DAOException e) {
-            throw new ServiceException(e);
+            throw new RepositoryException(e);
         }
     }
 }
