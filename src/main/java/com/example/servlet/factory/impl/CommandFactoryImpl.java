@@ -6,8 +6,12 @@ import com.example.servlet.factory.CommandFactory;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class CommandFactoryImpl implements CommandFactory {
+
+    private static final Logger logger = LogManager.getLogger(CommandFactoryImpl.class);
 
     @Getter
     private static final CommandFactoryImpl instance = new CommandFactoryImpl();
@@ -40,6 +44,7 @@ public class CommandFactoryImpl implements CommandFactory {
             }
         }
 
+        logger.error("No command with name ", action);
         throw new CommandException("No command with name " + action);
     }
 
