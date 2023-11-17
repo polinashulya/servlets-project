@@ -11,4 +11,6 @@ public interface CommandFactory {
                           HttpServletRequest request,
                           HttpServletResponse response)
             throws CommandException;
+
+    boolean isValidAction(String action);
 }

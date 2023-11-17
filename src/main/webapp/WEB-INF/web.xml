@@ -5,7 +5,7 @@
          version="3.0">
 
     <error-page>
-        <location>/WEB-INF/error_page.jsp</location>
+        <location>/error_page.jsp</location>
     </error-page>
 
 

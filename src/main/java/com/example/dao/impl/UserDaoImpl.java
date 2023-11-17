@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static com.example.dao.impl.DaoHelper.closeConnection;
 
-public class UserDaoImpl implements UserDao {
+public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
@@ -94,34 +94,40 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public User getById(long id) {
-        Connection connection = null;
-        PreparedStatement statement = null;
 
-        User user = null;
-        try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
-                    "FROM users u join countries c on u.country_id = c.id where u.id = ?;");
+        String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                "FROM users u join countries c on u.country_id = c.id where u.id = ?;";
 
-            statement.setLong(1, id);
+        return super.getById(sql, id, UserDaoImpl::getUser);
 
-            ResultSet set = statement.executeQuery();
-            logger.debug("Executing query: {}", statement.toString());
-
-            if (set.next()) {
-                user = getUser(set);
-            } else {
-                logger.warn("No user found by id " + id);
-            }
-
-        } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            throw new DAOException(ex);
-        } finally {
-            closeConnection(connection, statement);
-        }
-
-        return user;
+//        Connection connection = null;
+//        PreparedStatement statement = null;
+//
+//        User user = null;
+//        try {
+//            connection = connectionPool.getConnection();
+//            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+//                    "FROM users u join countries c on u.country_id = c.id where u.id = ?;");
+//
+//            statement.setLong(1, id);
+//
+//            ResultSet set = statement.executeQuery();
+//            logger.debug("Executing query: {}", statement.toString());
+//
+//            if (set.next()) {
+//                user = getUser(set);
+//            } else {
+//                logger.warn("No user found by id " + id);
+//            }
+//
+//        } catch (SQLException ex) {
+//            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
+//            throw new DAOException(ex);
+//        } finally {
+//            closeConnection(connection, statement);
+//        }
+//
+//        return user;
     }
 
     @Override
@@ -166,21 +172,26 @@ public class UserDaoImpl implements UserDao {
         return Optional.ofNullable(getByLogin(login));
     }
 
-    private static User getUser(ResultSet set) throws SQLException {
-        return User.builder()
-                .id(set.getLong(1))
-                .login(set.getString(2))
-                .firstname(set.getString(3))
-                .surname(set.getString(4))
-                .birthDate((set.getDate(5)).toLocalDate())
-                .banned(set.getBoolean(6))
-                .country(
-                        Country.builder()
-                                .id(set.getLong(7))
-                                .name(set.getString(8))
-                                .build()
-                )
-                .build();
+    private static User getUser(ResultSet set) {
+        try {
+            return User.builder()
+                    .id(set.getLong(1))
+                    .login(set.getString(2))
+                    .firstname(set.getString(3))
+                    .surname(set.getString(4))
+                    .birthDate((set.getDate(5)).toLocalDate())
+                    .banned(set.getBoolean(6))
+                    .country(
+                            Country.builder()
+                                    .id(set.getLong(7))
+                                    .name(set.getString(8))
+                                    .build()
+                    )
+                    .build();
+        } catch (SQLException e) {
+            // Handle the exception or rethrow as a runtime exception
+            throw new RuntimeException("Error mapping User from ResultSet", e);
+        }
     }
 
 
@@ -316,9 +327,9 @@ public class UserDaoImpl implements UserDao {
 
             if (set.next()) {
                 totalResult = set.getInt("totalUsers");
-            }  else {
-            logger.warn("The total result of users is null");
-        }
+            } else {
+                logger.warn("The total result of users is null");
+            }
 
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);

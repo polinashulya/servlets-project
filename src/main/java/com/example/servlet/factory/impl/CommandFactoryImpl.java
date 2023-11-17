@@ -1,6 +1,7 @@
 package com.example.servlet.factory.impl;
 
 import com.example.exception.CommandException;
+import com.example.servlet.AllowedActions;
 import com.example.servlet.Command;
 import com.example.servlet.factory.CommandFactory;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,7 @@ public class CommandFactoryImpl implements CommandFactory {
     @Getter
     private static final CommandFactoryImpl instance = new CommandFactoryImpl();
 
-    private CommandFactoryImpl() {
+    public CommandFactoryImpl() {
 
     }
 
@@ -42,11 +43,24 @@ public class CommandFactoryImpl implements CommandFactory {
             case "main_page" -> {
                 return new ViewMainPageCommand(request, response);
             }
+            case "error_page" -> {
+                return new ViewErrorPageCommand(request, response);
+            }
         }
 
-        logger.error("No command with name ", action);
+        logger.error("No command with name {}", action);
         throw new CommandException("No command with name " + action);
     }
 
+    @Override
+    public boolean isValidAction(String action) {
+        try {
+            AllowedActions.valueOf(action.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            logger.error("Invalid action: ", action);
+            return false;
+        }
+    }
 
 }

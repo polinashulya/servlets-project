@@ -1,12 +1,5 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: polinashulya
-  Date: 10.11.2023
-  Time: 21:23
-  To change this template use File | Settings | File Templates.
---%>
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page isErrorPage="true" %>
+<%@ page contentType="text/html;charset=windows-1251;charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -42,13 +35,25 @@
 </head>
 <body>
 <div class="error-container">
-        <img src="pictures/error_page/404.png" alt=""/>
-        <p>
-            <a href="mainWindow?action=main">
-                Go back to main page
-            </a>
-        </p>
+    <img src="pictures/error_page/404.png" alt=""/>
+    <p>
+        <a href="mainServlet?action=main_page">
+            Go back to main page
+        </a>
+    </p>
+
+    <!-- Показываем информацию об ошибке -->
+    <c:if test="${not empty requestScope['javax.servlet.error.exception']}">
+        <h1>Error Details:</h1>
+        <p>${requestScope[' jakarta.servlet.error.exception']}</p>
+
+
+    <c:if test="${not empty requestScope['error']}">
+        <h1>Error Details:</h1>
+        <p>${requestScope['error']}</p>
+    </c:if>
 </div>
+
 <%@ include file="/WEB-INF/footer.jsp" %>
 </body>
 </html>
