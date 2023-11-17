@@ -9,8 +9,8 @@ import java.util.Optional;
 public interface CountryDao {
     List<Country> findAll();
 
-    Country getById(long id);
+    Country getById(Long id);
 
-    Optional<Country> findById(long id);
+    Optional<Country> findById(Long id);
 
 }

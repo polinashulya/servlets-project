@@ -42,12 +42,6 @@
         </a>
     </p>
 
-    <!-- Показываем информацию об ошибке -->
-    <c:if test="${not empty requestScope['javax.servlet.error.exception']}">
-        <h1>Error Details:</h1>
-        <p>${requestScope[' jakarta.servlet.error.exception']}</p>
-
-
     <c:if test="${not empty requestScope['error']}">
         <h1>Error Details:</h1>
         <p>${requestScope['error']}</p>

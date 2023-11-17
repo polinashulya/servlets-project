@@ -8,13 +8,13 @@ import java.util.Optional;
 public interface UserDao {
     List<User> findAll(String filterAndSearchsql,String sortSql, String page, String pageSize);
 
-    User getById(long id);
+    User getById(Long id);
 
-    Optional<User> findById(long id);
+    Optional<User> findById(Long id);
 
     void save(User user);
 
-    void delete(long id);
+    void delete(Long id);
 
     User getByLogin(String login);
 

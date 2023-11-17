@@ -93,83 +93,40 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     }
 
     @Override
-    public User getById(long id) {
+    public User getById(Long id) {
 
         String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
-                "FROM users u join countries c on u.country_id = c.id where u.id = ?;";
+                "FROM users u join countries c on u.country_id = c.id where u.id = ? ";
 
         return super.getById(sql, id, UserDaoImpl::getUser);
 
-//        Connection connection = null;
-//        PreparedStatement statement = null;
-//
-//        User user = null;
-//        try {
-//            connection = connectionPool.getConnection();
-//            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
-//                    "FROM users u join countries c on u.country_id = c.id where u.id = ?;");
-//
-//            statement.setLong(1, id);
-//
-//            ResultSet set = statement.executeQuery();
-//            logger.debug("Executing query: {}", statement.toString());
-//
-//            if (set.next()) {
-//                user = getUser(set);
-//            } else {
-//                logger.warn("No user found by id " + id);
-//            }
-//
-//        } catch (SQLException ex) {
-//            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-//            throw new DAOException(ex);
-//        } finally {
-//            closeConnection(connection, statement);
-//        }
-//
-//        return user;
     }
 
     @Override
-    public Optional<User> findById(long id) {
-        return Optional.ofNullable(getById(id));
+    public Optional<User> findById(Long id) {
+
+        String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                "FROM users u join countries c on u.country_id = c.id where u.id = ?";
+
+        return super.findById(sql, id, UserDaoImpl::getUser);
     }
 
     @Override
     public User getByLogin(String login) {
-        Connection connection = null;
-        PreparedStatement statement = null;
 
-        User user = null;
-        try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
-                    "FROM users u join countries c on u.country_id = c.id where u.login = ?;");
+        String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                "FROM users u join countries c on u.country_id = c.id where u.login = ?";
 
-            statement.setString(1, login);
-
-            ResultSet set = statement.executeQuery();
-            logger.debug("Executing query: {}", statement.toString());
-
-            if (set.next()) {
-                user = getUser(set);
-            } else {
-                logger.warn("No user found with by login " + login);
-            }
-
-        } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            throw new DAOException(ex);
-        } finally {
-            closeConnection(connection, statement);
-        }
-
-        return user;
+        return super.getByLogin(sql, login, UserDaoImpl::getUser);
     }
 
     @Override
     public Optional<User> findByLogin(String login) {
-        return Optional.ofNullable(getByLogin(login));
+
+        String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                "FROM users u join countries c on u.country_id = c.id where u.login = ?";
+
+        return  super.findByLogin(sql, login, UserDaoImpl::getUser);
     }
 
     private static User getUser(ResultSet set) {
@@ -225,32 +182,16 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     }
 
+
     @Override
-    public void delete(long id) {
-        Connection connection = null;
-        PreparedStatement statement = null;
+    public void delete(Long id) {
 
-        try {
-            if (findById(id).isPresent()) {
-                connection = connectionPool.getConnection();
-                statement = connection.prepareStatement("UPDATE users u SET deleted=true where u.id = ?;");
-                statement.setLong(1, id);
+        String deleteSql = "UPDATE users u SET deleted=true where u.id = ?" ;
 
-                statement.executeUpdate();
-                logger.debug("Executing query: {}", statement.toString());
+        String findSql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
+                "FROM users u join countries c on u.country_id = c.id where u.id = ? ";
 
-            } else {
-                logger.debug("User with id = " + id + " was not found!");
-                throw new DAOException("User with id = " + id + " was not found!");
-            }
-        } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            System.err.println();
-            throw new DAOException(ex);
-        } finally {
-            closeConnection(connection, statement);
-        }
-
+        super.delete(deleteSql, findSql, id, UserDaoImpl::getUser);
     }
 
     private static String getSortByOrDefault(String sortBy) {

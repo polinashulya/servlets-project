@@ -3,9 +3,7 @@ package com.example.dao.impl;
 import com.example.dao.ConnectionPool;
 import com.example.dao.CountryDao;
 import com.example.entity.Country;
-import com.example.entity.User;
 import com.example.exception.DAOException;
-import com.example.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -19,9 +17,9 @@ import java.util.Optional;
 
 import static com.example.dao.impl.DaoHelper.closeConnection;
 
-public class CountryDaoImpl implements CountryDao {
+public class CountryDaoImpl extends AbstractDao<Country> implements CountryDao {
 
-    private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
+    private static final Logger logger = LogManager.getLogger(CountryDaoImpl.class);
 
     private final ConnectionPool connectionPool;
 
@@ -40,7 +38,7 @@ public class CountryDaoImpl implements CountryDao {
         try {
             connection = connectionPool.getConnection();
 
-            statement = connection.prepareStatement("select * from countries");
+            statement = connection.prepareStatement("select c.id, c.name from countries c");
             logger.debug("Executing query: {}", statement.toString());
 
             ResultSet set = statement.executeQuery();
@@ -61,46 +59,34 @@ public class CountryDaoImpl implements CountryDao {
         return countries;
     }
 
-    private Country getCountry(ResultSet set) throws SQLException {
-        return Country.builder()
-                .id(set.getLong(1))
-                .name(set.getString(2))
-                .build();
-    }
-
-    @Override
-    public Country getById(long id) {
-        Connection connection = null;
-        PreparedStatement statement = null;
-
-        Country country = null;
+    private static Country getCountry(ResultSet set)  {
         try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("SELECT c.id, c.name FROM countries c where c.id = ?;");
-
-            statement.setLong(1, id);
-            logger.debug("Executing query: {}", statement.toString());
-
-            ResultSet set = statement.executeQuery();
-
-            System.out.println(set);
-            if (set.next()) {
-                country = getCountry(set);
-            }
-
-        } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            throw new DAOException(ex);
-        } finally {
-            closeConnection(connection, statement);
+            return Country.builder()
+                    .id(set.getLong(1))
+                    .name(set.getString(2))
+                    .build();
+        } catch (SQLException e) {
+            // Handle the exception or rethrow as a runtime exception
+            throw new RuntimeException("Error mapping Country from ResultSet", e);
         }
+    }
 
-        return country;
+
+    @Override
+    public Country getById(Long id) {
+
+        String sql = "SELECT c.id, c.name FROM countries c where c.id = ? ";
+
+        return super.getById(sql, id, CountryDaoImpl::getCountry);
+
     }
 
     @Override
-    public Optional<Country> findById(long id) {
-        return Optional.ofNullable(getById(id));
+    public Optional<Country> findById(Long id) {
+
+        String sql = "SELECT c.id, c.name FROM countries c where c.id = ? ";
+
+        return super.findById(sql, id, CountryDaoImpl::getCountry);
     }
 
 }
