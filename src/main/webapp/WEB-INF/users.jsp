@@ -4,60 +4,12 @@
 <head>
     <style type="text/css">
         <%@ include file="/WEB-INF/css/table.css" %>
-
-        #main {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        form {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        select,
-        input[type="text"] {
-            padding: 8px;
-            font-size: 16px;
-            margin-right: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            padding: 8px 12px;
-            font-size: 14px;
-            background-color: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        button:disabled {
-            background-color: #ddd;
-            color: #888;
-        }
-
-        button.previous {
-            background-color: #2196f3;
-        }
-
-        button.next {
-            background-color: #2196f3;
-        }
     </style>
 </head>
 <body>
-<%@ include file="/WEB-INF/header.jsp" %>
+<div>
+    <%@ include file="/WEB-INF/header.jsp" %>
+</div>
 <div id="main">
     <form action="mainServlet?action=users" method="get">
 
@@ -115,7 +67,7 @@
         <button type="button" onclick="goToPage(${param.page - 1})" ${param.page <= 1 ? 'disabled' : ''}>Previous</button>
         <button type="button" onclick="goToPage(${param.page + 1})" ${param.page * param.pageSize >= totalResult ? 'disabled' : ''}>Next</button>
 
-        <input type="submit" value="Show">
+        <input type="submit" class="show-button" value="Show">
 
         <input hidden="hidden" name="action" value="users">
     </form>
@@ -153,6 +105,6 @@
         </tbody>
     </table>
 </div>
-<%--<%@ include file="/WEB-INF/footer.jsp" %>--%>
+<%@ include file="/WEB-INF/footer.jsp" %>
 </body>
 </html>

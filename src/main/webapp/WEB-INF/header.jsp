@@ -4,7 +4,6 @@
     <style type="text/css">
         <%@ include file="/WEB-INF/css/header.css" %>
     </style>
-    <title></title>
 </head>
 <body>
 <header class="header">
