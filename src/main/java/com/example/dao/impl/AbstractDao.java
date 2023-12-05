@@ -1,11 +1,11 @@
 package com.example.dao.impl;
 
-import com.example.dao.ConnectionPool;
+import com.example.dao.core.pool.connection.ConnectionWrapper;
+import com.example.dao.core.pool.connection.ProxyConnection;
 import com.example.exception.DAOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,52 +18,50 @@ public abstract class AbstractDao<T> {
 
     private static final Logger logger = LogManager.getLogger(AbstractDao.class);
 
-    private final ConnectionPool connectionPool;
-
     public AbstractDao() {
-        connectionPool = new ConnectionPool();
-        connectionPool.init();
+
     }
 
     public T getById(String sql, Long id, Function<ResultSet, T> function) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
 
         T t = null;
+
         try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement(sql);
+            proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+            ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
 
-            statement.setLong(1, id);
+            statement = connectionWrapper.prepareStatement("SELECT c.id, c.name FROM countries c");
+            ResultSet resultSet = statement.executeQuery();
 
-            ResultSet set = statement.executeQuery();
+            logger.info(resultSet);
 
-            logger.info(set);
-
-            if (set.next()) {
-                t = function.apply(set);
+            if (resultSet.next()) {
+                t = function.apply(resultSet);
             } else {
-                 logger.warn("No item found by id " + id);
+                logger.warn("No item found by id " + id);
             }
 
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
         return t;
     }
 
     public T getByLogin(String sql, String login, Function<ResultSet, T> function) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
 
         T t = null;
         try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement(sql);
+            proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+            ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
+            statement = connectionWrapper.prepareStatement(sql);
 
             statement.setString(1, login);
 
@@ -80,7 +78,7 @@ public abstract class AbstractDao<T> {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
         return t;
@@ -91,18 +89,20 @@ public abstract class AbstractDao<T> {
     }
 
 
-    public Optional<T> findByLogin(String sql, String login, Function<ResultSet, T> function){
+    public Optional<T> findByLogin(String sql, String login, Function<ResultSet, T> function) {
         return Optional.ofNullable(getByLogin(sql, login, function));
     }
 
     public void delete(String deleteSql, String findSql, Long id, Function<ResultSet, T> function) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
 
         try {
             if (findById(findSql, id, function).isPresent()) {
-                connection = connectionPool.getConnection();
-                statement = connection.prepareStatement(deleteSql);
+                proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+                ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
+
+                statement = connectionWrapper.prepareStatement(deleteSql);
 
                 statement.setLong(1, id);
 
@@ -118,7 +118,7 @@ public abstract class AbstractDao<T> {
             System.err.println();
             throw new DAOException(ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
     }

@@ -57,8 +57,9 @@ public class UserServiceImpl implements UserService {
             throw new ServiceException("Country is null or did not find!");
         }
 
-        userRepository.findByLogin(user.getLogin())
-                .orElseThrow(() -> new ServiceException("Login is already in use!"));
+        if ( userRepository.findByLogin(user.getLogin()).isPresent()) {
+            throw new ServiceException("Login is already in use!");
+        }
 
         try {
             userRepository.save(user);

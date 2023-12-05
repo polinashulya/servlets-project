@@ -1,7 +1,8 @@
 package com.example.dao.impl;
 
-import com.example.dao.ConnectionPool;
 import com.example.dao.UserDao;
+import com.example.dao.core.pool.connection.ConnectionWrapper;
+import com.example.dao.core.pool.connection.ProxyConnection;
 import com.example.entity.Country;
 import com.example.entity.User;
 import com.example.exception.DAOException;
@@ -40,17 +41,14 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
                     "WHERE u.deleted = 'false' ";
 
 
-    private final ConnectionPool connectionPool;
-
     public UserDaoImpl() {
-        connectionPool = new ConnectionPool();
-        connectionPool.init();
     }
 
     @Override
     public List<User> findAll(String filterAndSearchsql, String sortSql, String page, String pageSize) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
+
 
         String paginationSql;
         int offset = 0;
@@ -68,9 +66,10 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         List<User> users = new ArrayList<>();
 
         try {
-            connection = connectionPool.getConnection();
+            proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+            ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
 
-            statement = connection.prepareStatement(FIND_ALL_USERS + filterAndSearchsql + sortSql + paginationSql);
+            statement = connectionWrapper.prepareStatement(FIND_ALL_USERS + filterAndSearchsql + sortSql + paginationSql);
 
             ResultSet set = statement.executeQuery();
             logger.debug("Executing query: {}", statement.toString());
@@ -86,7 +85,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
         return users;
@@ -126,7 +125,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         String sql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
                 "FROM users u join countries c on u.country_id = c.id where u.login = ?";
 
-        return  super.findByLogin(sql, login, UserDaoImpl::getUser);
+        return super.findByLogin(sql, login, UserDaoImpl::getUser);
     }
 
     private static User getUser(ResultSet set) {
@@ -154,12 +153,14 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public void save(User user) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
 
         try {
-            connection = connectionPool.getConnection();
-            statement = connection.prepareStatement("INSERT INTO users (login, password, firstname, surname, birth_date, banned, deleted, country_id ) VALUES (?,?,?,?,?,?,?, ?);");
+            proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+            ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
+
+            statement = connectionWrapper.prepareStatement("INSERT INTO users (login, password, firstname, surname, birth_date, banned, deleted, country_id ) VALUES (?,?,?,?,?,?,?, ?);");
 
             statement.setString(1, user.getLogin());
             statement.setString(2, user.getPassword());
@@ -174,10 +175,10 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
             logger.debug("Executing query: {}", statement.toString());
 
         } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            throw new DAOException(ex);
+            logger.error("An SQL exception occurred while executing query: {}", statement.toString(), ex);
+            throw new DAOException("An SQL exception occurred while executing query", ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
     }
@@ -186,7 +187,7 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
     @Override
     public void delete(Long id) {
 
-        String deleteSql = "UPDATE users u SET deleted=true where u.id = ?" ;
+        String deleteSql = "UPDATE users u SET deleted=true where u.id = ?";
 
         String findSql = "SELECT u.id, u.login, u.firstname, u.surname, u.birth_date, u.banned, u.country_id, c.name " +
                 "FROM users u join countries c on u.country_id = c.id where u.id = ? ";
@@ -253,15 +254,16 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     @Override
     public int getTotalResult(String filterAndSearchsql) {
-        Connection connection = null;
+        ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
 
         int totalResult = 0;
 
         try {
-            connection = connectionPool.getConnection();
+            proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
+            ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
 
-            statement = connection.prepareStatement(TOTAL_COUNT_USERS + filterAndSearchsql);
+            statement = connectionWrapper.prepareStatement(TOTAL_COUNT_USERS + filterAndSearchsql);
 
             ResultSet set = statement.executeQuery();
             logger.debug("Executing query: {}", statement.toString());
@@ -273,10 +275,10 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
             }
 
         } catch (SQLException ex) {
-            logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
-            throw new DAOException(ex);
+            logger.error("An SQL exception occurred while executing query: {}", statement.toString(), ex);
+            throw new DAOException("An SQL exception occurred while executing query", ex);
         } finally {
-            closeConnection(connection, statement);
+            closeConnection(proxyConnection, statement);
         }
 
         return totalResult;

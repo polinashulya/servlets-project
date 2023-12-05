@@ -1,17 +1,26 @@
-package com.example.dao.core.pool;
+package com.example.dao.core.pool.connection;
+
 
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
+
+/**
+ * Wrapper under {@code java.sql.Connection}
+ * Has only one new method {@code realClose}
+ * that doing close logic.
+ * Base method close is clear now.
+ */
 public class ConnectionWrapper implements Connection {
 
     private Connection connection;
 
-    public ConnectionWrapper(Connection connection) {
+    ConnectionWrapper(Connection connection) {
         this.connection = connection;
     }
+
 
     @Override
     public void close() throws SQLException {
@@ -21,6 +30,7 @@ public class ConnectionWrapper implements Connection {
     void realClose() throws SQLException {
         connection.close();
     }
+
 
     @Override
     public Statement createStatement() throws SQLException {
@@ -43,13 +53,13 @@ public class ConnectionWrapper implements Connection {
     }
 
     @Override
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        connection.setAutoCommit(autoCommit);
+    public boolean getAutoCommit() throws SQLException {
+        return connection.getAutoCommit();
     }
 
     @Override
-    public boolean getAutoCommit() throws SQLException {
-        return connection.getAutoCommit();
+    public void setAutoCommit(boolean autoCommit) throws SQLException {
+        connection.setAutoCommit(autoCommit);
     }
 
     @Override
@@ -62,6 +72,7 @@ public class ConnectionWrapper implements Connection {
         connection.rollback();
     }
 
+
     @Override
     public boolean isClosed() throws SQLException {
         return connection.isClosed();
@@ -73,18 +84,13 @@ public class ConnectionWrapper implements Connection {
     }
 
     @Override
-    public void setReadOnly(boolean readOnly) throws SQLException {
-        connection.setReadOnly(readOnly);
-    }
-
-    @Override
     public boolean isReadOnly() throws SQLException {
         return connection.isReadOnly();
     }
 
     @Override
-    public void setCatalog(String catalog) throws SQLException {
-        connection.setCatalog(catalog);
+    public void setReadOnly(boolean readOnly) throws SQLException {
+        connection.setReadOnly(readOnly);
     }
 
     @Override
@@ -93,13 +99,18 @@ public class ConnectionWrapper implements Connection {
     }
 
     @Override
-    public void setTransactionIsolation(int level) throws SQLException {
-        connection.setTransactionIsolation(level);
+    public void setCatalog(String catalog) throws SQLException {
+        connection.setCatalog(catalog);
     }
 
     @Override
     public int getTransactionIsolation() throws SQLException {
         return connection.getTransactionIsolation();
+    }
+
+    @Override
+    public void setTransactionIsolation(int level) throws SQLException {
+        connection.setTransactionIsolation(level);
     }
 
     @Override
@@ -138,13 +149,13 @@ public class ConnectionWrapper implements Connection {
     }
 
     @Override
-    public void setHoldability(int holdability) throws SQLException {
-        connection.setHoldability(holdability);
+    public int getHoldability() throws SQLException {
+        return connection.getHoldability();
     }
 
     @Override
-    public int getHoldability() throws SQLException {
-        return connection.getHoldability();
+    public void setHoldability(int holdability) throws SQLException {
+        connection.setHoldability(holdability);
     }
 
     @Override
@@ -222,15 +233,9 @@ public class ConnectionWrapper implements Connection {
         return connection.isValid(timeout);
     }
 
-
     @Override
     public void setClientInfo(String name, String value) throws SQLClientInfoException {
         connection.setClientInfo(name, value);
-    }
-
-    @Override
-    public void setClientInfo(Properties properties) throws SQLClientInfoException {
-        connection.setClientInfo(properties);
     }
 
     @Override
@@ -241,6 +246,11 @@ public class ConnectionWrapper implements Connection {
     @Override
     public Properties getClientInfo() throws SQLException {
         return connection.getClientInfo();
+    }
+
+    @Override
+    public void setClientInfo(Properties properties) throws SQLClientInfoException {
+        connection.setClientInfo(properties);
     }
 
     @Override
@@ -288,3 +298,5 @@ public class ConnectionWrapper implements Connection {
         return connection.isWrapperFor(iface);
     }
 }
+
+
