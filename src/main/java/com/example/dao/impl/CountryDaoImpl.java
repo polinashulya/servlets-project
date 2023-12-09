@@ -22,8 +22,6 @@ public class CountryDaoImpl extends AbstractDao<Country> implements CountryDao {
 
     private static final Logger logger = LogManager.getLogger(CountryDaoImpl.class);
 
-    public CountryDaoImpl() {}
-
     @Override
     public List<Country> findAll() {
         ProxyConnection proxyConnection = null;

@@ -40,10 +40,6 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
                     "join countries c on u.country_id = c.id " +
                     "WHERE u.deleted = 'false' ";
 
-
-    public UserDaoImpl() {
-    }
-
     @Override
     public List<User> findAll(String filterAndSearchsql, String sortSql, String page, String pageSize) {
         ProxyConnection proxyConnection = null;

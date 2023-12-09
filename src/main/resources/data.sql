@@ -17,5 +17,16 @@ create table countries
     name character(20) NOT NULL UNIQUE
 );
 
+insert into users(login, password, firstname, surname, country_id, birth_date, banned, deleted)
+values ('user1', 'pass12', 'Anton', 'Petrov', 2, 2001-03-08, false, false);
+insert into users(login, password, firstname, surname, country_id, birth_date, banned, deleted)
+values ('user2', 'pass123', 'Mike', 'Stern', 3, 2000-03-10, false, false);
+
+insert into countries(name) values ('Spain');
+insert into countries(name) values ('Belarus');
+insert into countries(name) values ('Switzerland');
+insert into countries(name) values ('Italy');
+
+
 ALTER TABLE users
     ADD FOREIGN KEY (country_id) REFERENCES countries (id);

@@ -18,10 +18,6 @@ public abstract class AbstractDao<T> {
 
     private static final Logger logger = LogManager.getLogger(AbstractDao.class);
 
-    public AbstractDao() {
-
-    }
-
     public T getById(String sql, Long id, Function<ResultSet, T> function) {
         ProxyConnection proxyConnection = null;
         PreparedStatement statement = null;
