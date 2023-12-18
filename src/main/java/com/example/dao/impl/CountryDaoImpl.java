@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.dao.impl.DaoHelper.closeConnection;
-
 public class CountryDaoImpl extends AbstractDao<Country> implements CountryDao {
 
     private static final Logger logger = LogManager.getLogger(CountryDaoImpl.class);
@@ -46,8 +44,6 @@ public class CountryDaoImpl extends AbstractDao<Country> implements CountryDao {
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
-            } finally {
-                closeConnection(proxyConnection, statement);
             }
 
         return countries;

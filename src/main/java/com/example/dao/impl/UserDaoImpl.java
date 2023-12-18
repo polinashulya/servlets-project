@@ -15,8 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.example.dao.impl.DaoHelper.closeConnection;
-
 public class UserDaoImpl extends AbstractDao<User> implements UserDao {
 
     private static final Logger logger = LogManager.getLogger(UserServiceImpl.class);
@@ -80,8 +78,6 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred: {}", ex.getMessage(), ex);
             throw new DAOException(ex);
-        } finally {
-            closeConnection(proxyConnection, statement);
         }
 
         return users;
@@ -173,8 +169,6 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred while executing query: {}", statement.toString(), ex);
             throw new DAOException("An SQL exception occurred while executing query", ex);
-        } finally {
-            closeConnection(proxyConnection, statement);
         }
 
     }
@@ -273,8 +267,6 @@ public class UserDaoImpl extends AbstractDao<User> implements UserDao {
         } catch (SQLException ex) {
             logger.error("An SQL exception occurred while executing query: {}", statement.toString(), ex);
             throw new DAOException("An SQL exception occurred while executing query", ex);
-        } finally {
-            closeConnection(proxyConnection, statement);
         }
 
         return totalResult;
