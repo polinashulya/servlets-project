@@ -28,7 +28,10 @@ public abstract class AbstractDao<T> {
             proxyConnection = CountryDaoImpl.ConnectionCreator.getProxyConnection();
             ConnectionWrapper connectionWrapper = proxyConnection.getConnectionWrapper();
 
-            statement = connectionWrapper.prepareStatement("SELECT c.id, c.name FROM countries c");
+            statement = connectionWrapper.prepareStatement(sql);
+
+            statement.setLong(1, id);
+
             ResultSet resultSet = statement.executeQuery();
 
             logger.info(resultSet);
